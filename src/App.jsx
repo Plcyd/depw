@@ -612,6 +612,8 @@ export default function App({ initialRouteTab = 'command' }) {
         {activeTab === 'command' && (
           <CommandCenterView
             tickets={tickets}
+            assets={assets}
+            userProfile={userProfile}
             metricsData={metricsData}
             onRefreshData={fetchAllData}
             onOpenTicketAudit={(ticketId) => {
@@ -681,6 +683,8 @@ export default function App({ initialRouteTab = 'command' }) {
           <StreetMapView
             tickets={tickets}
             assets={assets}
+            userProfile={userProfile}
+            onRefreshTickets={fetchAllData}
             selectedMapTicket={selectedMapTicket}
             onSelectTicketOnTracker={(ticket) => {
               if (ticket?.ticketId) {

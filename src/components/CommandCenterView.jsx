@@ -41,12 +41,16 @@ import { api } from '../services/api.js';
 import { MANILA_16_DISTRICTS, TICKET_STATUSES } from '../utils/workflowRules.js';
 import ThresholdAlertNotification from './ThresholdAlertNotification.jsx';
 import WaterQualityZoneLogger from './WaterQualityZoneLogger.jsx';
+import StreetMapView from './StreetMapView.jsx';
 
 const CHART_COLORS = ['#38bdf8', '#818cf8', '#34d399', '#fbbf24', '#f97316', '#f43f5e', '#a855f7', '#2dd4bf'];
 
 export default function CommandCenterView({
   tickets = [],
+  assets = [],
+  userProfile,
   metricsData: externalMetricsData = null,
+  onRefreshData,
   onInspectTicketAudit,
   onOpenTicketAudit,
   onOpenSmartTracker,
@@ -495,6 +499,20 @@ export default function CommandCenterView({
           flowIndex: 92,
         }}
         onNavigateToLab={() => onNavigateTab && onNavigateTab('bioscience')}
+      />
+
+      {/* Interactive React-Leaflet Manila Districts & Declogging Site Pinning Map */}
+      <StreetMapView
+        tickets={tickets}
+        assets={assets}
+        userProfile={userProfile}
+        onRefreshTickets={onRefreshData}
+        onSelectTicketOnTracker={() => {
+          if (onOpenSmartTracker) onOpenSmartTracker();
+          else if (onNavigateTab) onNavigateTab('tracker');
+        }}
+        showToast={showToast}
+        compactMode={true}
       />
 
       {/* Drainage Zone Water Quality Data Entry Form, Simple List View & Zone Visualizer */}

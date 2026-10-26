@@ -1843,3 +1843,421 @@ export function validateUserProfile(input = {}) {
   };
 }
 
+/**
+ * Geographic polygon boundaries, centroids, and drainage waterway metadata
+ * for all 16 Administrative Districts of the City of Manila (used by React-Leaflet).
+ */
+export const MANILA_DISTRICT_POLYGONS = [
+  {
+    name: 'Tondo',
+    legislativeDistrict: '1st District',
+    lat: 14.6195,
+    lng: 120.9678,
+    color: '#38bdf8',
+    esteros: ['Estero de Vitas', 'Estero de Maypajo', 'Estero de Sunog Apog'],
+     sampleBarangay: 'Barangay 123, Zone 10',
+    positions: [
+      [14.6365, 120.9580],
+      [14.6365, 120.9765],
+      [14.6055, 120.9755],
+      [14.6055, 120.9575],
+    ],
+  },
+  {
+    name: 'San Nicolas',
+    legislativeDistrict: '3rd District',
+    lat: 14.6012,
+    lng: 120.9675,
+    color: '#22d3ee',
+    esteros: ['Estero de Binondo', 'Pasig River Lower Reach'],
+    sampleBarangay: 'Barangay 275, Zone 25',
+    positions: [
+      [14.6055, 120.9605],
+      [14.6055, 120.9720],
+      [14.5960, 120.9720],
+      [14.5960, 120.9605],
+    ],
+  },
+  {
+    name: 'Binondo',
+    legislativeDistrict: '3rd District',
+    lat: 14.6010,
+    lng: 120.9745,
+    color: '#06b6d4',
+    esteros: ['Estero de la Reina', 'Estero de Binondo', 'Estero de Magdalena'],
+    sampleBarangay: 'Barangay 289, Zone 27',
+    positions: [
+      [14.6055, 120.9720],
+      [14.6055, 120.9790],
+      [14.5965, 120.9790],
+      [14.5965, 120.9720],
+    ],
+  },
+  {
+    name: 'Santa Cruz',
+    legislativeDistrict: '3rd District',
+    lat: 14.6152,
+    lng: 120.9825,
+    color: '#818cf8',
+    esteros: ['Estero de San Lazaro', 'Estero de Magdalena'],
+    sampleBarangay: 'Barangay 350, Zone 35',
+    positions: [
+      [14.6320, 120.9765],
+      [14.6320, 120.9885],
+      [14.6035, 120.9865],
+      [14.6035, 120.9765],
+    ],
+  },
+  {
+    name: 'Quiapo',
+    legislativeDistrict: '3rd District',
+    lat: 14.5994,
+    lng: 120.9848,
+    color: '#a855f7',
+    esteros: ['Estero de Quiapo', 'Estero de San Miguel'],
+    sampleBarangay: 'Barangay 384, Zone 39',
+    positions: [
+      [14.6035, 120.9790],
+      [14.6035, 120.9905],
+      [14.5945, 120.9895],
+      [14.5945, 120.9790],
+    ],
+  },
+  {
+    name: 'Sampaloc',
+    legislativeDistrict: '4th District',
+    lat: 14.6110,
+    lng: 120.9955,
+    color: '#f59e0b',
+    esteros: ['Estero de Valencia', 'Estero de Sampaloc', 'España Box Culvert'],
+    sampleBarangay: 'Barangay 452, Zone 45',
+    positions: [
+      [14.6245, 120.9885],
+      [14.6245, 121.0085],
+      [14.6015, 121.0055],
+      [14.6015, 120.9885],
+    ],
+  },
+  {
+    name: 'San Miguel',
+    legislativeDistrict: '6th District',
+    lat: 14.5955,
+    lng: 120.9942,
+    color: '#ec4899',
+    esteros: ['Estero de San Miguel', 'Estero de Aviles'],
+    sampleBarangay: 'Barangay 638, Zone 65',
+    positions: [
+      [14.6015, 120.9895],
+      [14.6015, 121.0010],
+      [14.5915, 121.0005],
+      [14.5915, 120.9895],
+    ],
+  },
+  {
+    name: 'Santa Mesa',
+    legislativeDistrict: '4th District',
+    lat: 14.6018,
+    lng: 121.0124,
+    color: '#f97316',
+    esteros: ['San Juan River Confluence', 'Pasig River Upper Bend'],
+    sampleBarangay: 'Barangay 587, Zone 58',
+    positions: [
+      [14.6095, 121.0055],
+      [14.6095, 121.0235],
+      [14.5940, 121.0215],
+      [14.5940, 121.0055],
+    ],
+  },
+  {
+    name: 'Port Area',
+    legislativeDistrict: '1st District',
+    lat: 14.5889,
+    lng: 120.9642,
+    color: '#0ea5e9',
+    esteros: ['Manila Bay South Harbor Outfall', 'Pasig River Mouth'],
+    sampleBarangay: 'Barangay 650, Zone 68',
+    positions: [
+      [14.5955, 120.9565],
+      [14.5955, 120.9705],
+      [14.5825, 120.9705],
+      [14.5825, 120.9565],
+    ],
+  },
+  {
+    name: 'Intramuros',
+    legislativeDistrict: '5th District',
+    lat: 14.5896,
+    lng: 120.9747,
+    color: '#10b981',
+    esteros: ['Lawton Gravity Outfall', 'Intramuros Moat Storm Drain'],
+    sampleBarangay: 'Barangay 655, Zone 69',
+    positions: [
+      [14.5955, 120.9705],
+      [14.5955, 120.9815],
+      [14.5845, 120.9805],
+      [14.5845, 120.9705],
+    ],
+  },
+  {
+    name: 'Ermita',
+    legislativeDistrict: '5th District',
+    lat: 14.5826,
+    lng: 120.9822,
+    color: '#34d399',
+    esteros: ['Padre Faura Storm Interceptor', 'Estero de Balete'],
+    sampleBarangay: 'Barangay 669, Zone 72',
+    positions: [
+      [14.5915, 120.9755],
+      [14.5915, 120.9900],
+      [14.5755, 120.9885],
+      [14.5755, 120.9755],
+    ],
+  },
+  {
+    name: 'Malate',
+    legislativeDistrict: '5th District',
+    lat: 14.5685,
+    lng: 120.9912,
+    color: '#14b8a6',
+    esteros: ['Estero de Maytubig', 'Estero de San Antonio Abad', 'Remedios Outfall'],
+    sampleBarangay: 'Barangay 704, Zone 77',
+    positions: [
+      [14.5755, 120.9810],
+      [14.5755, 120.9985],
+      [14.5595, 120.9975],
+      [14.5595, 120.9810],
+    ],
+  },
+  {
+    name: 'Paco',
+    legislativeDistrict: '5th District',
+    lat: 14.5805,
+    lng: 120.9964,
+    color: '#eab308',
+    esteros: ['Estero de Paco', 'Estero de Concordia', 'Estero de Tanque'],
+    sampleBarangay: 'Barangay 678, Zone 74',
+    positions: [
+      [14.5895, 120.9900],
+      [14.5895, 121.0030],
+      [14.5755, 121.0020],
+      [14.5755, 120.9900],
+    ],
+  },
+  {
+    name: 'Pandacan',
+    legislativeDistrict: '6th District',
+    lat: 14.5882,
+    lng: 121.0058,
+    color: '#f43f5e',
+    esteros: ['Estero de Pandacan', 'Beata Storm Channel'],
+    sampleBarangay: 'Barangay 847, Zone 92',
+    positions: [
+      [14.5940, 121.0005],
+      [14.5940, 121.0125],
+      [14.5830, 121.0115],
+      [14.5830, 121.0005],
+    ],
+  },
+  {
+    name: 'San Andres Bukid',
+    legislativeDistrict: '5th District',
+    lat: 14.5718,
+    lng: 121.0044,
+    color: '#6366f1',
+    esteros: ['Estero de Tripa de Gallina', 'Zobel Roxas Box Culvert'],
+    sampleBarangay: 'Barangay 775, Zone 84',
+    positions: [
+      [14.5755, 120.9985],
+      [14.5755, 121.0105],
+      [14.5645, 121.0095],
+      [14.5645, 120.9985],
+    ],
+  },
+  {
+    name: 'Santa Ana',
+    legislativeDistrict: '6th District',
+    lat: 14.5801,
+    lng: 121.0135,
+    color: '#84cc16',
+    esteros: ['Estero de Santa Clara', 'Pasig River Santa Ana Bend'],
+    sampleBarangay: 'Barangay 885, Zone 98',
+    positions: [
+      [14.5865, 121.0090],
+      [14.5865, 121.0225],
+      [14.5720, 121.0210],
+      [14.5720, 121.0090],
+    ],
+  },
+];
+
+function isPointInPolygon(lat, lng, polygonPositions = []) {
+  let inside = false;
+  for (let i = 0, j = polygonPositions.length - 1; i < polygonPositions.length; j = i++) {
+    const xi = polygonPositions[i][0];
+    const yi = polygonPositions[i][1];
+    const xj = polygonPositions[j][0];
+    const yj = polygonPositions[j][1];
+
+    const intersect =
+      yi > lng !== yj > lng &&
+      lat < ((xj - xi) * (lng - yi)) / (yj - yi + 1e-12) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function haversineDistanceKm(lat1, lng1, lat2, lng2) {
+  const toRad = (deg) => (deg * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * Given latitude and longitude coordinates, detects the corresponding Manila District,
+ * Legislative District, nearest estero waterway, and whether the pin is inside Manila bounds.
+ */
+export function detectManilaDistrictFromCoords(rawLat, rawLng) {
+  const lat = typeof rawLat === 'number' ? rawLat : Number(rawLat);
+  const lng = typeof rawLng === 'number' ? rawLng : Number(rawLng);
+
+  if (
+    rawLat === null ||
+    rawLat === undefined ||
+    rawLng === null ||
+    rawLng === undefined ||
+    String(rawLat).trim() === '' ||
+    String(rawLng).trim() === '' ||
+    Number.isNaN(lat) ||
+    Number.isNaN(lng) ||
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lng)
+  ) {
+    return null;
+  }
+
+  const isWithinManilaBounds =
+    lat >= 14.54 && lat <= 14.66 && lng >= 120.94 && lng <= 121.04;
+
+  // 1. Check exact polygon containment first
+  for (const dist of MANILA_DISTRICT_POLYGONS) {
+    if (isPointInPolygon(lat, lng, dist.positions)) {
+      return {
+        district: dist.name,
+        legislativeDistrict: dist.legislativeDistrict,
+        nearestEstero: dist.esteros[0] || 'Manila Storm Drainage Line',
+        sampleBarangay: dist.sampleBarangay,
+        color: dist.color,
+        distanceKm: Number(haversineDistanceKm(lat, lng, dist.lat, dist.lng).toFixed(2)),
+        isWithinManilaBounds: true,
+        lat: Number(lat.toFixed(5)),
+        lng: Number(lng.toFixed(5)),
+      };
+    }
+  }
+
+  // 2. Fallback to closest district centroid
+  let closest = MANILA_DISTRICT_POLYGONS[0];
+  let minDistance = Infinity;
+  for (const dist of MANILA_DISTRICT_POLYGONS) {
+    const d = haversineDistanceKm(lat, lng, dist.lat, dist.lng);
+    if (d < minDistance) {
+      minDistance = d;
+      closest = dist;
+    }
+  }
+
+  return {
+    district: closest.name,
+    legislativeDistrict: closest.legislativeDistrict,
+    nearestEstero: closest.esteros[0] || 'Manila Storm Drainage Line',
+    sampleBarangay: closest.sampleBarangay,
+    color: closest.color,
+    distanceKm: Number(minDistance.toFixed(2)),
+    isWithinManilaBounds,
+    lat: Number(lat.toFixed(5)),
+    lng: Number(lng.toFixed(5)),
+  };
+}
+
+/**
+ * Validates a user-pinned declogging site before creating a ticket or map pin entry.
+ */
+export function validatePinnedDecloggingSite(input = {}) {
+  const errors = [];
+  const detected = detectManilaDistrictFromCoords(input.latitude, input.longitude);
+
+  if (!detected) {
+    errors.push('Valid map pin coordinates (latitude and longitude) are required.');
+  } else if (detected.lat < -90 || detected.lat > 90 || detected.lng < -180 || detected.lng > 180) {
+    errors.push('Coordinates are outside valid geographic bounds.');
+  }
+
+  const barangay = String(input.barangay || '').trim();
+  const streetAddress = String(input.streetAddress || '').trim();
+  const requesterName = String(input.requesterName || '').trim();
+  const description = String(input.description || '').trim();
+
+  if (!barangay || barangay.length < 2) {
+    errors.push('Barangay name is required (at least 2 characters).');
+  }
+  if (!streetAddress || streetAddress.length < 3) {
+    errors.push('Street or canal site location is required (at least 3 characters).');
+  }
+  if (!requesterName || requesterName.length < 2) {
+    errors.push('Reporting officer or Barangay official name is required.');
+  }
+  if (!description || description.length < 5) {
+    errors.push('Site obstruction description is required (at least 5 characters).');
+  }
+
+  const district = String(input.district || detected?.district || '').trim();
+  const legislativeDistrict = String(
+    input.legislativeDistrict || detected?.legislativeDistrict || '1st District'
+  ).trim();
+  const requestType = REQUEST_TYPES.includes(input.requestType)
+    ? input.requestType
+    : 'Declogging';
+  const priority = PRIORITY_LEVELS.includes(input.priority)
+    ? input.priority
+    : 'Elevated';
+
+  if (errors.length > 0) {
+    return {
+      isValid: false,
+      errors,
+      payload: null,
+      detectedDistrict: detected,
+    };
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    detectedDistrict: detected,
+    payload: {
+      barangay,
+      district,
+      legislativeDistrict,
+      streetAddress,
+      requestType,
+      priority,
+      requesterName,
+      requesterRole: String(input.requesterRole || 'Barangay Kagawad').trim(),
+      description,
+      latitude: detected.lat,
+      longitude: detected.lng,
+      coordSource: 'React-Leaflet Interactive District Pin',
+      coordVerified: true,
+    },
+  };
+}
+
+

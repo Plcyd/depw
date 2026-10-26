@@ -291,3 +291,60 @@ test('user profile helpers validate officer profile fields and compute initials 
   assert.equal(validProfile.profile.badgeId, 'DEPW-MNL-2026-029');
 });
 
+test('Manila district polygons, coordinate district detection, and pinned declogging site validation work accurately', async () => {
+  const {
+    MANILA_DISTRICT_POLYGONS,
+    detectManilaDistrictFromCoords,
+    validatePinnedDecloggingSite,
+  } = await import('./workflowRules.js');
+
+  assert.equal(MANILA_DISTRICT_POLYGONS.length, 16);
+  for (const poly of MANILA_DISTRICT_POLYGONS) {
+    assert.ok(poly.positions.length >= 4);
+    assert.ok(poly.esteros.length >= 1);
+  }
+
+  // Null / invalid coordinates return null
+  assert.equal(detectManilaDistrictFromCoords('', ''), null);
+  assert.equal(detectManilaDistrictFromCoords('invalid', 120.98), null);
+
+  // Detects Tondo inside Tondo polygon
+  const tondoDetected = detectManilaDistrictFromCoords(14.6195, 120.9678);
+  assert.equal(tondoDetected.district, 'Tondo');
+  assert.equal(tondoDetected.legislativeDistrict, '1st District');
+  assert.equal(tondoDetected.isWithinManilaBounds, true);
+
+  // Detects Sampaloc inside Sampaloc polygon
+  const sampalocDetected = detectManilaDistrictFromCoords(14.6110, 120.9955);
+  assert.equal(sampalocDetected.district, 'Sampaloc');
+  assert.equal(sampalocDetected.legislativeDistrict, '4th District');
+
+  // Validates pinned declogging site
+  const invalidPin = validatePinnedDecloggingSite({
+    latitude: null,
+    longitude: null,
+    barangay: '',
+    streetAddress: '',
+    requesterName: '',
+    description: '',
+  });
+  assert.equal(invalidPin.isValid, false);
+  assert.ok(invalidPin.errors.length >= 4);
+
+  const validPin = validatePinnedDecloggingSite({
+    latitude: 14.6112,
+    longitude: 120.9958,
+    barangay: 'Barangay 452, Zone 45',
+    streetAddress: 'España Blvd. cor. Maceda Box Culvert',
+    requestType: 'Declogging',
+    priority: 'High Priority',
+    requesterName: 'Engr. Lorenzo T. Macapagal',
+    description: 'Reported silted curb inlet and drainage blockage during heavy rain.',
+  });
+  assert.equal(validPin.isValid, true);
+  assert.equal(validPin.payload.district, 'Sampaloc');
+  assert.equal(validPin.payload.legislativeDistrict, '4th District');
+  assert.equal(validPin.payload.coordVerified, true);
+});
+
+
