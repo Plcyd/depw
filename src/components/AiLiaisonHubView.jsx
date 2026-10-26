@@ -15,7 +15,10 @@ import {
   MANILA_DISTRICTS,
   DRAINAGE_TYPES,
   generateSampleRequestLetter,
-  evaluateTicketCompleteness
+  evaluateTicketCompleteness,
+  DEPW_PRIVACY_CONSENT_NOTICE,
+  DEPW_DATA_PRIVACY_GUIDELINES,
+  detectAndMaskSensitivePII,
 } from '../utils/workflowRules.js';
 
 export default function AiLiaisonHubView({ tickets = [], user, onUserChange, showToast }) {
@@ -123,25 +126,29 @@ export default function AiLiaisonHubView({ tickets = [], user, onUserChange, sho
   const handleGenerateAi = async () => {
     setAiLoading(true);
     try {
+      const sanitizedKagawad = detectAndMaskSensitivePII(kagawadInput).sanitizedText;
+      const sanitizedNotes = detectAndMaskSensitivePII(issueNotes).sanitizedText;
+      const sanitizedStreet = detectAndMaskSensitivePII(streetInput).sanitizedText;
+
       if (aiMode === 'rule') {
         if (taskType === 'draft_letter') {
           const letterObj = generateSampleRequestLetter({
             dateReceived: 'October 20, 2026',
             barangay: barangayInput,
             district: districtInput,
-            requesterName: kagawadInput,
-            streetAddress: streetInput,
+            requesterName: sanitizedKagawad,
+            streetAddress: sanitizedStreet,
             requestType: drainageInput
           });
           setAiOutput(formatLetterObj(letterObj));
-          setAiModelUsed('Deterministic Rule Engine (Offline Safe)');
+          setAiModelUsed('Deterministic Rule Engine (Offline Safe • PII Masked)');
         } else if (taskType === 'missing_info') {
           const check = evaluateTicketCompleteness({
             barangay: barangayInput,
             district: districtInput,
-            streetAddress: streetInput,
-            requesterName: kagawadInput,
-            description: issueNotes,
+            streetAddress: sanitizedStreet,
+            requesterName: sanitizedKagawad,
+            description: sanitizedNotes,
             latitude: 14.611,
             longitude: 120.995
           });
@@ -150,16 +157,17 @@ export default function AiLiaisonHubView({ tickets = [], user, onUserChange, sho
             `COMPLETENESS SCORE: ${check.score}% (${check.isComplete ? 'READY FOR REVIEW' : 'NEEDS ADDITIONAL INFO'})\n\n` +
             `Missing / Recommended Items:\n` +
             (missingArr.length > 0 ? missingArr.map((m) => `• ${m}`).join('\n') : '• All core intake fields present.') +
-            `\n\nAdvisory Note: Human engineering verification is required before field scheduling.`
+            `\n\nExplicit Consent Notice:\n"${DEPW_PRIVACY_CONSENT_NOTICE}"\n\n` +
+            `Advisory Note: Human engineering verification is required before field scheduling.`
           );
           setAiModelUsed('Deterministic Completeness Rules');
         } else {
           setAiOutput(
             `MEMORANDUM FOR COORDINATING LIAISON\n` +
             `Subject: Status Update for ${barangayInput} (${districtInput})\n` +
-            `Location: ${streetInput} — ${drainageInput}\n\n` +
-            `Summary of Field Report:\n${issueNotes}\n\n` +
-            `Recommended Action: Verify site access with ${kagawadInput} and schedule DEPW Area Engineering Team ocular inspection.`
+            `Location: ${sanitizedStreet} — ${drainageInput}\n\n` +
+            `Summary of Field Report:\n${sanitizedNotes}\n\n` +
+            `Recommended Action: Verify site access with ${sanitizedKagawad} and schedule DEPW Area Engineering Team ocular inspection.`
           );
           setAiModelUsed('Deterministic Rule Engine');
         }
@@ -167,9 +175,9 @@ export default function AiLiaisonHubView({ tickets = [], user, onUserChange, sho
       }
 
       const promptMap = {
-        draft_letter: `Draft a formal, respectful bilingual (Filipino and English) Barangay Declogging Request Letter addressed to the Department of Engineering Office (City of Manila) from ${barangayInput} (${districtInput}), through ${kagawadInput}, requesting declogging assistance at ${streetInput} (${drainageInput}). Field observation: ${issueNotes}.`,
-        missing_info: `Review this Barangay Declogging Request intake for completeness and potential missing engineering details: Barangay: ${barangayInput}, District: ${districtInput}, Street: ${streetInput}, Drainage Type: ${drainageInput}, Contact Person: ${kagawadInput}, Description: ${issueNotes}. Provide a clear bulleted completeness checklist and explain what the Liaison Officer should clarify before forwarding to the Area Engineer.`,
-        status_memo: `Write a concise, clear Liaison Status Coordination Memo for Barangay Officials summarizing the request at ${streetInput}, ${barangayInput} (${districtInput}) for ${drainageInput}. Explain the next workflow steps clearly without making unauthorized scheduling promises.`
+        draft_letter: `Draft a formal, respectful bilingual (Filipino and English) Barangay Declogging Request Letter addressed to the Department of Engineering Office (City of Manila) from ${barangayInput} (${districtInput}), through ${sanitizedKagawad}, requesting declogging assistance at ${sanitizedStreet} (${drainageInput}). Field observation: ${sanitizedNotes}. Never repeat sensitive PII.`,
+        missing_info: `Review this Barangay Declogging Request intake for completeness and potential missing engineering details: Barangay: ${barangayInput}, District: ${districtInput}, Street: ${sanitizedStreet}, Drainage Type: ${drainageInput}, Contact Person: ${sanitizedKagawad}, Description: ${sanitizedNotes}. Provide a clear bulleted completeness checklist and explain what the Liaison Officer should clarify before forwarding to the Area Engineer.`,
+        status_memo: `Write a concise, clear Liaison Status Coordination Memo for Barangay Officials summarizing the request at ${sanitizedStreet}, ${barangayInput} (${districtInput}) for ${drainageInput}. Explain the next workflow steps clearly without making unauthorized scheduling promises.`
       };
 
       const res = await api.aiAssist({
@@ -179,14 +187,15 @@ export default function AiLiaisonHubView({ tickets = [], user, onUserChange, sho
         ticketData: {
           barangay: barangayInput,
           district: districtInput,
-          streetAddress: streetInput,
+          streetAddress: sanitizedStreet,
           requestType: drainageInput,
-          requesterName: kagawadInput,
-          description: issueNotes
+          requesterName: sanitizedKagawad,
+          description: sanitizedNotes
         }
       });
 
-      setAiOutput(res.result || res.text || '');
+      const maskedResult = detectAndMaskSensitivePII(res.result || res.text || '');
+      setAiOutput(maskedResult.sanitizedText);
       setAiModelUsed(res.modelUsed || res.model || aiMode);
     } catch (err) {
       if (showToast) showToast(`AI assist fallback activated: ${err.message}`, 'info');
@@ -387,20 +396,40 @@ export default function AiLiaisonHubView({ tickets = [], user, onUserChange, sho
   const handleSendLiveTurn = (e) => {
     e.preventDefault();
     if (!liveInput.trim()) return;
-    const text = liveInput.trim();
-    setLiveTranscripts((prev) => [...prev, { role: 'user', text }]);
+    const rawText = liveInput.trim();
+    const piiGuard = detectAndMaskSensitivePII(rawText);
+    const safeText = piiGuard.sanitizedText;
+
+    // Never echo sensitive PII back in the chat
+    setLiveTranscripts((prev) => [
+      ...prev,
+      { role: 'user', text: safeText },
+      ...(piiGuard.hasSensitivePII
+        ? [
+            {
+              role: 'system',
+              text: `🛡️ [No PII Disclosure Guardrail]: Sensitive personal identifiers (${piiGuard.detectedTypes.join(
+                ', '
+              )}) were detected and automatically masked as [REDACTED SENSITIVE PII]. ${
+                DEPW_DATA_PRIVACY_GUIDELINES.noPiiDisclosure
+              } ${DEPW_DATA_PRIVACY_GUIDELINES.publicChatSafeguard}`,
+            },
+          ]
+        : []),
+    ]);
     setLiveInput('');
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'text', text }));
+      wsRef.current.send(JSON.stringify({ type: 'text', text: safeText }));
     } else {
-      // Fallback response if WebSocket is not active
       setTimeout(() => {
         setLiveTranscripts((prev) => [
           ...prev,
           {
             role: 'assistant',
-            text: `[Liaison Coach Advisory]: Para sa kahilingan ng ${barangayInput}, siguraduhin pong naitala ang eksaktong kalye (${streetInput}), landmark, at pangalan ng Barangay Kagawad bago ipadala sa Area Engineer para sa Ocular Inspection.`
+            text: `[Liaison Coach Advisory]: Para sa kahilingan ng ${barangayInput}, siguraduhin pong naitala ang eksaktong kalye (${
+              detectAndMaskSensitivePII(streetInput).sanitizedText
+            }), landmark, at pangalan ng Barangay Kagawad bago ipadala sa Area Engineer para sa Ocular Inspection. Paalala sa Privacy: "${DEPW_PRIVACY_CONSENT_NOTICE}"`
           }
         ]);
       }, 400);
@@ -446,6 +475,61 @@ export default function AiLiaisonHubView({ tickets = [], user, onUserChange, sho
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* Data Privacy & Protection Guidelines Panel */}
+        <div
+          style={{
+            marginTop: '14px',
+            paddingTop: '14px',
+            borderTop: '1px solid var(--glass-border)',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '12px',
+          }}
+        >
+          <div className={styles.glassCard} style={{ padding: '12px 14px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', marginBottom: '4px' }}>
+              1. Compliance & Data Minimization
+            </div>
+            <div style={{ fontSize: '11.5px', color: '#cbd5e1', lineHeight: 1.45 }}>
+              <strong>Purpose Limitation:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.purposeLimitation}
+              <br />
+              <strong>Data Minimization:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.dataMinimization}
+            </div>
+          </div>
+
+          <div className={styles.glassCard} style={{ padding: '12px 14px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', marginBottom: '4px' }}>
+              2. Explicit Consent Notice
+            </div>
+            <blockquote
+              style={{
+                margin: 0,
+                paddingLeft: '10px',
+                borderLeft: '2px solid #34d399',
+                fontSize: '11.5px',
+                fontStyle: 'italic',
+                color: '#f8fafc',
+                lineHeight: 1.45,
+              }}
+            >
+              “{DEPW_PRIVACY_CONSENT_NOTICE}”
+            </blockquote>
+          </div>
+
+          <div className={styles.glassCard} style={{ padding: '12px 14px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', marginBottom: '4px' }}>
+              3. Masking & Sensitive Information Guardrails
+            </div>
+            <div style={{ fontSize: '11.5px', color: '#cbd5e1', lineHeight: 1.45 }}>
+              <strong>No PII Disclosure:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.noPiiDisclosure}
+              <br />
+              <strong>Public Chat Safeguard:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.publicChatSafeguard}
+              <br />
+              <strong>Data Retention Disclaimer:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.dataRetentionDisclaimer}
+            </div>
           </div>
         </div>
       </div>

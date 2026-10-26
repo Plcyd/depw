@@ -37,6 +37,9 @@ import {
   detectManilaDistrictFromCoords,
   validatePinnedDecloggingSite,
   getManilaSpatialDrainageContext,
+  DEPW_PRIVACY_CONSENT_NOTICE,
+  DEPW_DATA_PRIVACY_GUIDELINES,
+  detectAndMaskSensitivePII,
 } from '../utils/workflowRules.js';
 import { api } from '../services/api.js';
 
@@ -257,6 +260,7 @@ export default function StreetMapView({
     requesterRole: userProfile?.roleTitle || 'Barangay Kagawad',
     description:
       'Pinned declogging site: Accumulated silt and street debris obstructing storm drain inlet.',
+    privacyConsentGiven: true,
   });
   const [pinFormErrors, setPinFormErrors] = useState([]);
   const [pinSaving, setPinSaving] = useState(false);
@@ -376,6 +380,13 @@ export default function StreetMapView({
     e.preventDefault();
     setPinFormErrors([]);
     setLastPinnedSuccess(null);
+
+    if (!pinForm.privacyConsentGiven) {
+      const msg = 'Explicit consent to the DEPW public service privacy guidelines is required before logging contact details.';
+      setPinFormErrors([msg]);
+      if (showToast) showToast(msg, 'error');
+      return;
+    }
 
     const validation = validatePinnedDecloggingSite({
       latitude: pinnedCoords?.lat,
@@ -1369,6 +1380,29 @@ export default function StreetMapView({
                     marginBottom: '3px',
                   }}
                 >
+                  Coordinating Contact Person (Barangay / DEPW Official)
+                </label>
+                <input
+                  type="text"
+                  className={styles.glassInput}
+                  value={pinForm.requesterName}
+                  onChange={(e) =>
+                    setPinForm((prev) => ({ ...prev, requesterName: e.target.value }))
+                  }
+                  placeholder="Contact Person's Official Name"
+                />
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '3px',
+                  }}
+                >
                   Obstruction & Site Condition Notes
                 </label>
                 <input
@@ -1381,6 +1415,91 @@ export default function StreetMapView({
                   placeholder="Describe silt buildup, standing floodwater, or blocked manhole..."
                 />
               </div>
+
+              {/* Explicit Consent Notice & Privacy Guardrails before logging contact details */}
+              {(() => {
+                const piiCheck = detectAndMaskSensitivePII(
+                  `${pinForm.requesterName || ''} ${pinForm.description || ''}`
+                );
+                return (
+                  <div
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      background: 'rgba(6, 15, 34, 0.85)',
+                      border: '1px solid rgba(52, 211, 153, 0.35)',
+                      fontSize: '11px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontWeight: 800,
+                        color: '#6ee7b7',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      Explicit Consent Notice & Data Minimization
+                    </div>
+                    <blockquote
+                      style={{
+                        margin: '0 0 6px 0',
+                        paddingLeft: '8px',
+                        borderLeft: '2px solid #38bdf8',
+                        fontStyle: 'italic',
+                        color: '#e2e8f0',
+                      }}
+                    >
+                      “{DEPW_PRIVACY_CONSENT_NOTICE}”
+                    </blockquote>
+                    <div style={{ fontSize: '10.5px', color: '#94a3b8', marginBottom: '6px' }}>
+                      {DEPW_DATA_PRIVACY_GUIDELINES.dataRetentionDisclaimer}
+                    </div>
+                    {piiCheck.hasSensitivePII && (
+                      <div
+                        style={{
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          background: 'rgba(245, 158, 11, 0.18)',
+                          border: '1px solid rgba(245, 158, 11, 0.45)',
+                          color: '#fde68a',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        Sensitive PII detected ({piiCheck.detectedTypes.join(', ')}) — will be masked automatically before saving.
+                      </div>
+                    )}
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '6px',
+                        cursor: 'pointer',
+                        color: '#f8fafc',
+                        fontWeight: 600,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={Boolean(pinForm.privacyConsentGiven)}
+                        onChange={(e) =>
+                          setPinForm((prev) => ({
+                            ...prev,
+                            privacyConsentGiven: e.target.checked,
+                          }))
+                        }
+                        style={{ marginTop: '2px' }}
+                      />
+                      <span>
+                        I consent to DEPW processing contact and location details solely for verifying and servicing this official ticket.
+                      </span>
+                    </label>
+                  </div>
+                );
+              })()}
 
               <button
                 type="submit"

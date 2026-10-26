@@ -100,6 +100,7 @@ if (rootElement && (typeof window === 'undefined' || !window.__DEPW_ROOT_RENDERE
             <Route path="/tracker" element={<App initialRouteTab="tracker" />} />
             <Route path="/flowchart" element={<App initialRouteTab="flowchart" />} />
             <Route path="/waterlog" element={<App initialRouteTab="waterlog" />} />
+            <Route path="/project" element={<App initialRouteTab="project" />} />
             <Route path="/map" element={<App initialRouteTab="map" />} />
             <Route path="/presentation" element={<App initialRouteTab="presentation" />} />
             <Route path="/3d" element={<App initialRouteTab="3d" />} />

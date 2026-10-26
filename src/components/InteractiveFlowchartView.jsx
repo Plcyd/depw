@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import styles from '../styles/GlassSystem.module.css';
 import { FLOWCHART_STAGES, TICKET_STATUSES } from '../utils/workflowRules.js';
+import AutomatedProblemSolverProjectView from './AutomatedProblemSolverProjectView.jsx';
 
 export default function InteractiveFlowchartView({
   tickets = [],
@@ -413,6 +414,9 @@ export default function InteractiveFlowchartView({
           </div>
         </div>
       )}
+
+      {/* Embedded Step-by-Step Automated Problem-Solver Project – Design Your Custom Workflow (4 Sets • 11 Items • 250 Total Score) */}
+      <AutomatedProblemSolverProjectView showToast={showToast} />
     </div>
   );
 }

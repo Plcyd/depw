@@ -347,4 +347,103 @@ test('Manila district polygons, coordinate district detection, and pinned declog
   assert.equal(validPin.payload.coordVerified, true);
 });
 
+test('Data Privacy & Protection Guidelines: explicit consent notice, data minimization, and sensitive PII masking work accurately', async () => {
+  const {
+    DEPW_PRIVACY_CONSENT_NOTICE,
+    DEPW_DATA_PRIVACY_GUIDELINES,
+    detectAndMaskSensitivePII,
+    sanitizeTicketPayloadPrivacy,
+  } = await import('./workflowRules.js');
+
+  assert.equal(
+    DEPW_PRIVACY_CONSENT_NOTICE,
+    'By providing your contact details, you consent to DEPW processing your information solely for verifying and coordinating this service request under our public service privacy guidelines.'
+  );
+  assert.ok(DEPW_DATA_PRIVACY_GUIDELINES.purposeLimitation.includes('strictly'));
+  assert.ok(DEPW_DATA_PRIVACY_GUIDELINES.dataMinimization.includes('Never request or store'));
+  assert.ok(DEPW_DATA_PRIVACY_GUIDELINES.publicChatSafeguard.includes('Viber'));
+  assert.ok(DEPW_DATA_PRIVACY_GUIDELINES.dataRetentionDisclaimer.includes('operational logs'));
+
+  // Clean operational text has no sensitive PII
+  const cleanRes = detectAndMaskSensitivePII(
+    'Requesting declogging of silted box culvert along España Blvd cor. Maceda St. Contact: Kagawad Juan Cruz'
+  );
+  assert.equal(cleanRes.hasSensitivePII, false);
+  assert.equal(cleanRes.redactionCount, 0);
+
+  // Detects and masks accidental TIN, SSS, Password, Birthdate, and Credit Card without echoing sensitive values
+  const sensitiveSample =
+    'Please log ticket. My TIN: 123-456-789-000, SSS: 34-1234567-8, Password: MySecretPassword99, DOB: 1985-04-12, Card: 4532-1111-2222-3333.';
+  const maskRes = detectAndMaskSensitivePII(sensitiveSample);
+  assert.equal(maskRes.hasSensitivePII, true);
+  assert.ok(maskRes.redactionCount >= 4);
+  assert.equal(maskRes.sanitizedText.includes('123-456-789-000'), false);
+  assert.equal(maskRes.sanitizedText.includes('34-1234567-8'), false);
+  assert.equal(maskRes.sanitizedText.includes('MySecretPassword99'), false);
+  assert.equal(maskRes.sanitizedText.includes('1985-04-12'), false);
+  assert.equal(maskRes.sanitizedText.includes('4532-1111-2222-3333'), false);
+  assert.ok(maskRes.sanitizedText.includes('[REDACTED SENSITIVE PII]'));
+
+  // Enforces explicit consent when required and strips disallowed minimization fields
+  const rejectedConsent = sanitizeTicketPayloadPrivacy(
+    {
+      barangay: 'Barangay 123, Zone 10',
+      requesterName: 'Juan D. Cruz',
+      description: 'Blocked drainage canal, TIN 123-456-789-000',
+      birthdate: '1980-01-01',
+      tin: '123-456-789-000',
+      financialDetails: 'BPI 1234567890',
+      privacyConsentAccepted: false,
+    },
+    { requireConsent: true }
+  );
+  assert.equal(rejectedConsent.isValid, false);
+  assert.ok(rejectedConsent.errors[0].includes(DEPW_PRIVACY_CONSENT_NOTICE));
+  assert.ok(rejectedConsent.strippedFields.includes('birthdate'));
+  assert.ok(rejectedConsent.strippedFields.includes('tin'));
+  assert.ok(rejectedConsent.strippedFields.includes('financialDetails'));
+  assert.equal('birthdate' in rejectedConsent.sanitizedPayload, false);
+  assert.equal(rejectedConsent.sanitizedPayload.description.includes('123-456-789-000'), false);
+});
+
+test('Automated Problem-Solver Project – Design Your Custom Workflow matches 4 Sets, 11 Items, 250 Total Score, and team rules', async () => {
+  const {
+    AUTOMATED_PROBLEM_SOLVER_PROJECT,
+    evaluateProblemSolverProjectSubmission,
+  } = await import('./workflowRules.js');
+
+  assert.equal(
+    AUTOMATED_PROBLEM_SOLVER_PROJECT.title,
+    'Automated Problem-Solver Project – Design Your Custom Workflow'
+  );
+  assert.equal(AUTOMATED_PROBLEM_SOLVER_PROJECT.totalSets, 4);
+  assert.equal(AUTOMATED_PROBLEM_SOLVER_PROJECT.totalItems, 11);
+  assert.equal(AUTOMATED_PROBLEM_SOLVER_PROJECT.totalScore, 250);
+  assert.equal(AUTOMATED_PROBLEM_SOLVER_PROJECT.passingGradePercent, 70);
+  assert.equal(AUTOMATED_PROBLEM_SOLVER_PROJECT.sets.length, 4);
+
+  const flatItems = AUTOMATED_PROBLEM_SOLVER_PROJECT.sets.flatMap((s) => s.items);
+  assert.equal(flatItems.length, 11);
+  const sumPoints = flatItems.reduce((acc, item) => acc + item.maxPoints, 0);
+  assert.equal(sumPoints, 250);
+
+  // Standard 4-member group requires 1 workflow and achieves 250/250 with default answers
+  const groupOf4 = evaluateProblemSolverProjectSubmission({ memberCount: 4 });
+  assert.equal(groupOf4.requiredWorkflowCount, 1);
+  assert.equal(groupOf4.earnedScore, 250);
+  assert.equal(groupOf4.percentage, 100);
+  assert.equal(groupOf4.passed, true);
+
+  // Team with > 4 members (e.g. 5 members) requires 2 separate workflows
+  const groupOf5 = evaluateProblemSolverProjectSubmission({
+    memberCount: 5,
+    workflow2Answers: { 'ITEM-1': '' }, // empty 2nd workflow item 1 loses half points on item 1
+  });
+  assert.equal(groupOf5.requiredWorkflowCount, 2);
+  assert.equal(groupOf5.earnedScore, 240);
+  assert.equal(groupOf5.passed, true);
+});
+
+
+
 

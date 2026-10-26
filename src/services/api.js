@@ -19,6 +19,8 @@ import {
   findPotentialDuplicates,
   generateSampleRequestLetter,
   getManilaSpatialDrainageContext,
+  detectAndMaskSensitivePII,
+  sanitizeTicketPayloadPrivacy,
 } from '../utils/workflowRules.js';
 
 const WQL_STORAGE_KEY = 'depw_water_quality_logs_v1';
@@ -746,7 +748,15 @@ export const api = {
     }
   },
 
-  createTicket: async (payload) => {
+  createTicket: async (rawPayload) => {
+    const privacyCheck = sanitizeTicketPayloadPrivacy(rawPayload || {}, { requireConsent: false });
+    if (!privacyCheck.isValid) {
+      const err = new Error(privacyCheck.errors[0]);
+      err.status = 400;
+      throw err;
+    }
+    const payload = privacyCheck.sanitizedPayload;
+
     try {
       const res = await requestJson('/api/tickets', {
         method: 'POST',
@@ -756,7 +766,11 @@ export const api = {
         const current = getLocalTickets();
         saveLocalTickets([res.ticket, ...current.filter((t) => t.ticketId !== res.ticket.ticketId)]);
       }
-      return res;
+      return {
+        ...res,
+        privacyRedacted: privacyCheck.hasRedactions,
+        detectedPiiTypes: privacyCheck.detectedTypes,
+      };
     } catch (err) {
       if (err.status === 400) throw err;
       const existingRows = getLocalTickets();
@@ -845,7 +859,9 @@ export const api = {
     }
   },
 
-  updateTicket: async (ticketId, payload) => {
+  updateTicket: async (ticketId, rawPayload) => {
+    const privacyCheck = sanitizeTicketPayloadPrivacy(rawPayload || {}, { requireConsent: false });
+    const payload = privacyCheck.sanitizedPayload;
     try {
       const res = await requestJson(`/api/tickets/${encodeURIComponent(ticketId)}`, {
         method: 'PATCH',
@@ -1165,44 +1181,63 @@ export const api = {
   geocode: (query) => api.geocodeStreet(query),
 
   runAiAssist: async (payload = {}) => {
+    const rawTicket = payload.ticket || payload.ticketData || {};
+    const privacySanitized = sanitizeTicketPayloadPrivacy(rawTicket, { requireConsent: false });
+    const safeTicket = privacySanitized.sanitizedPayload;
+    const promptCheck = detectAndMaskSensitivePII(payload.prompt || payload.customPrompt || '');
+    const hadSensitivePii = privacySanitized.hasRedactions || promptCheck.hasSensitivePII;
+
+    const safePayload = {
+      ...payload,
+      prompt: promptCheck.sanitizedText,
+      customPrompt: promptCheck.sanitizedText,
+      ticket: safeTicket,
+      ticketData: safeTicket,
+    };
+
     try {
       const res = await requestJson('/api/ai/assist', {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(safePayload),
       });
-      const textOut = res.output || res.result || res.text || '';
+      const textOut = detectAndMaskSensitivePII(res.output || res.result || res.text || '').sanitizedText;
       return {
         ...res,
+        piiRedacted: Boolean(res.piiRedacted || hadSensitivePii),
         output: textOut,
         result: textOut,
         text: textOut,
       };
     } catch {
-      const ticket = payload.ticket || payload.ticketData || {};
+      const ticket = safeTicket;
       const mode = payload.task || payload.mode || 'draft_letter';
       const baseLetter = generateSampleRequestLetter(ticket);
       const completeness = evaluateRequestCompleteness(ticket);
       const allTickets = getLocalTickets();
       const duplicates = findPotentialDuplicates(ticket, allTickets);
+      const piiNote = hadSensitivePii
+        ? '\n\n[DEPW Data Privacy & PII Masking Guardrail]: Sensitive personal identifiers (e.g., government IDs, tax numbers, passwords, birthdates, or financial accounts) were automatically masked as [REDACTED SENSITIVE PII] and never echoed back.'
+        : '';
 
       let outputText = '';
       if (mode === 'summarize' || mode === 'status_memo') {
-        outputText = `MEMORANDUM FOR COORDINATING LIAISON (DEPW MANILA)\nSubject: Status & Technical Summary — ${ticket.barangay || 'Barangay 123, Zone 10'} (${ticket.district || 'Tondo'})\nLocation: ${ticket.streetAddress || 'Estero de Vitas Service Road'} (${ticket.requestType || 'Declogging'})\n\n1. Current Status: ${ticket.status || 'For Verification'}\n2. Completeness Score: ${completeness.score}%\n3. Field Notes: ${ticket.description || 'Accumulated silt and debris reported along drainage line.'}\n4. Recommended Next Step: ${getExplainableNextStep(ticket.status || 'For Verification').suggestedNextStep}\n\n[Advisory]: Human engineering verification and joint ocular inspection with ${ticket.requesterName || 'Barangay Kagawad'} are required prior to vactor unit dispatch.`;
+        outputText = `MEMORANDUM FOR COORDINATING LIAISON (DEPW MANILA)\nSubject: Status & Technical Summary — ${ticket.barangay || 'Barangay 123, Zone 10'} (${ticket.district || 'Tondo'})\nLocation: ${ticket.streetAddress || 'Estero de Vitas Service Road'} (${ticket.requestType || 'Declogging'})\n\n1. Current Status: ${ticket.status || 'For Verification'}\n2. Completeness Score: ${completeness.score}%\n3. Field Notes: ${ticket.description || 'Accumulated silt and debris reported along drainage line.'}\n4. Recommended Next Step: ${getExplainableNextStep(ticket.status || 'For Verification').suggestedNextStep}\n\n[Advisory]: Human engineering verification and joint ocular inspection with ${ticket.requesterName || 'Barangay Kagawad'} are required prior to vactor unit dispatch.${piiNote}`;
       } else if (mode === 'missing_info' || mode === 'missing_check') {
-        const missingList = completeness.missingFields?.length
-          ? completeness.missingFields.map((f) => `• Missing / Needs Verification: ${f}`).join('\n')
+        const missingList = completeness.missing?.length
+          ? completeness.missing.map((f) => `• Missing / Needs Verification: ${f}`).join('\n')
           : '• All mandatory Barangay intake fields (Barangay, District, Street Segment, Coordinating Official, and Description) are present.';
-        outputText = `DEPW LIAISON COMPLETENESS AUDIT\nCompleteness Score: ${completeness.score}% (${completeness.isComplete ? 'READY FOR ENGINEERING ENDORSEMENT' : 'REQUIRES CLARIFICATION'})\n\nChecklist Findings:\n${missingList}\n\nNext Action: Verify exact nearest cross-street landmark and manhole access clearance with ${ticket.requesterName || 'the Barangay official'}.`;
+        outputText = `DEPW LIAISON COMPLETENESS AUDIT\nCompleteness Score: ${completeness.score}% (${completeness.isComplete ? 'READY FOR ENGINEERING ENDORSEMENT' : 'REQUIRES CLARIFICATION'})\n\nChecklist Findings:\n${missingList}\n\nNext Action: Verify exact nearest cross-street landmark and manhole access clearance with ${ticket.requesterName || 'the Barangay official'}.${piiNote}`;
       } else {
-        outputText = `${baseLetter.bodyTagalog}\n\n[English Liaison Translation Draft]:\nWe respectfully request technical assistance from the Department of Engineering and Public Works (City of Manila) to conduct ${ticket.requestType || 'declogging'} operations along the drainage channel at ${ticket.streetAddress || 'Estero de Vitas Service Road'}, ${ticket.barangay || 'Barangay 123, Zone 10'} (${ticket.district || 'Tondo'}). Silt and debris accumulation has been observed affecting stormwater runoff. We are ready to coordinate with the DEPW Area Engineer for a joint ocular site inspection.`;
+        outputText = `${baseLetter.bodyTagalog}\n\n[English Liaison Translation Draft]:\nWe respectfully request technical assistance from the Department of Engineering and Public Works (City of Manila) to conduct ${ticket.requestType || 'declogging'} operations along the drainage channel at ${ticket.streetAddress || 'Estero de Vitas Service Road'}, ${ticket.barangay || 'Barangay 123, Zone 10'} (${ticket.district || 'Tondo'}). Silt and debris accumulation has been observed affecting stormwater runoff. We are ready to coordinate with the DEPW Area Engineer for a joint ocular site inspection.${piiNote}`;
       }
 
       return {
         source: 'rule_based_fallback',
-        modelUsed: 'DEPW Bilingual Liaison Engine (Client Mode)',
+        modelUsed: 'DEPW Bilingual Liaison Engine (Privacy-Protected)',
         draftBadge: 'DRAFT — BILINGUAL LIAISON TEMPLATE (REQUIRES HUMAN REVIEW)',
         completeness,
         duplicates,
+        piiRedacted: hadSensitivePii,
         output: outputText,
         result: outputText,
         text: outputText,

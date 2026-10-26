@@ -33,6 +33,9 @@ import {
   calculateDashboardMetrics,
   ticketsToCsv,
   getWhatShouldIDoNext,
+  DEPW_PRIVACY_CONSENT_NOTICE,
+  DEPW_DATA_PRIVACY_GUIDELINES,
+  detectAndMaskSensitivePII,
 } from '../utils/workflowRules.js';
 import { api } from '../services/api.js';
 import {
@@ -109,6 +112,7 @@ export default function SmartTrackerView({
     longitude: 120.9678,
     coordSource: 'Verified Street Pin',
     coordVerified: true,
+    privacyConsentGiven: true,
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -319,15 +323,26 @@ export default function SmartTrackerView({
     if (!createForm.description || createForm.description.trim().length < 5) {
       errs.description = 'Description must be at least 5 characters.';
     }
+    if (!createForm.privacyConsentGiven) {
+      errs.privacyConsent = 'Explicit consent to the DEPW public service privacy guidelines is required before logging contact details.';
+    }
     if (Object.keys(errs).length > 0) {
       setFormErrors(errs);
       return;
     }
 
+    const descPiiCheck = detectAndMaskSensitivePII(createForm.description);
+    const reqPiiCheck = detectAndMaskSensitivePII(createForm.requesterName);
+    const sanitizedPayload = {
+      ...createForm,
+      requesterName: reqPiiCheck.sanitizedText,
+      description: descPiiCheck.sanitizedText,
+    };
+
     setSubmitting(true);
     setFormErrors({});
     try {
-      const res = await api.createTicket(createForm);
+      const res = await api.createTicket(sanitizedPayload);
       if (res.ticket) {
         await syncTicketToFirestore(res.ticket).catch(() => {});
         await onRefreshTickets();
@@ -607,6 +622,35 @@ export default function SmartTrackerView({
               onChange={(e) => setSlaThresholdDays(Number(e.target.value) || 3)}
               className="w-16 bg-slate-900 border border-sky-400/30 rounded px-2 py-1 text-center font-mono"
             />
+          </div>
+        </div>
+
+        {/* Data Privacy & Protection Guidelines Compliance Strip */}
+        <div className="mt-4 p-3.5 rounded-xl bg-slate-900/80 border border-emerald-400/30 space-y-2 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-mono font-bold text-emerald-300 uppercase tracking-wider">
+              🛡️ Data Privacy & Protection Guidelines (Purpose Limitation • Data Minimization • No PII Disclosure)
+            </span>
+            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-200 font-semibold text-[11px]">
+              RA 10173 & DEPW Safeguards Active
+            </span>
+          </div>
+          <blockquote className="pl-3 border-l-2 border-cyan-400 italic text-slate-200">
+            “{DEPW_PRIVACY_CONSENT_NOTICE}”
+          </blockquote>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px] text-slate-300">
+            <div>
+              <strong className="text-sky-300">1. Compliance & Data Minimization:</strong>{' '}
+              {DEPW_DATA_PRIVACY_GUIDELINES.purposeLimitation} {DEPW_DATA_PRIVACY_GUIDELINES.dataMinimization}
+            </div>
+            <div>
+              <strong className="text-amber-300">2. No PII Disclosure & Public Chat Safeguard:</strong>{' '}
+              {DEPW_DATA_PRIVACY_GUIDELINES.noPiiDisclosure} {DEPW_DATA_PRIVACY_GUIDELINES.publicChatSafeguard}
+            </div>
+            <div>
+              <strong className="text-emerald-300">3. Data Retention Disclaimer:</strong>{' '}
+              {DEPW_DATA_PRIVACY_GUIDELINES.dataRetentionDisclaimer}
+            </div>
           </div>
         </div>
       </div>
@@ -1959,6 +2003,58 @@ export default function SmartTrackerView({
                   <div className="text-xs text-rose-400 mt-1">{formErrors.description}</div>
                 )}
               </div>
+
+              {/* Explicit Consent Notice & Sensitive PII Guardrails */}
+              {(() => {
+                const livePii = detectAndMaskSensitivePII(
+                  `${createForm.requesterName || ''} ${createForm.description || ''}`
+                );
+                return (
+                  <div className="p-3.5 rounded-xl bg-slate-900/90 border border-emerald-400/35 space-y-2 text-xs">
+                    <div className="font-mono font-bold text-emerald-300 uppercase">
+                      2. Explicit Consent Notice & Data Minimization Guardrails
+                    </div>
+                    <blockquote className="pl-3 border-l-2 border-cyan-400 italic text-slate-100">
+                      “{DEPW_PRIVACY_CONSENT_NOTICE}”
+                    </blockquote>
+                    <div className="text-[11px] text-slate-300 space-y-1">
+                      <div>
+                        • <strong>Data Minimization:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.dataMinimization}
+                      </div>
+                      <div>
+                        • <strong>Public Chat Safeguard:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.publicChatSafeguard}
+                      </div>
+                      <div>
+                        • <strong>Data Retention Disclaimer:</strong> {DEPW_DATA_PRIVACY_GUIDELINES.dataRetentionDisclaimer}
+                      </div>
+                    </div>
+                    {livePii.hasSensitivePII && (
+                      <div className="p-2.5 rounded-lg bg-amber-950/80 border border-amber-400/50 text-amber-200 text-xs">
+                        <strong>Sensitive PII Guardrail Triggered:</strong> Accidental personal identifiers ({livePii.detectedTypes.join(', ')}) detected. They will automatically be masked as <code>[REDACTED SENSITIVE PII]</code> and never echoed back.
+                      </div>
+                    )}
+                    <label className="flex items-start gap-2 pt-1 cursor-pointer text-slate-100 font-medium">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(createForm.privacyConsentGiven)}
+                        onChange={(e) =>
+                          setCreateForm((prev) => ({
+                            ...prev,
+                            privacyConsentGiven: e.target.checked,
+                          }))
+                        }
+                        className="mt-0.5 accent-cyan-400"
+                      />
+                      <span>
+                        I confirm explicit consent under the DEPW public service privacy guidelines and verify that no sensitive personal identifiers (IDs, birthdates, financial data) are included.
+                      </span>
+                    </label>
+                    {formErrors.privacyConsent && (
+                      <div className="text-xs text-rose-400">{formErrors.privacyConsent}</div>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div className="flex justify-end gap-3 pt-2">
                 <button

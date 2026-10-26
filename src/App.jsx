@@ -38,6 +38,7 @@ import Drainage3DView from './components/Drainage3DView.jsx';
 import AiLiaisonHubView from './components/AiLiaisonHubView.jsx';
 import BioscienceLabView from './components/BioscienceLabView.jsx';
 import WaterQualityZoneLogger from './components/WaterQualityZoneLogger.jsx';
+import AutomatedProblemSolverProjectView from './components/AutomatedProblemSolverProjectView.jsx';
 import ThemeSwitcher from './components/ThemeSwitcher.jsx';
 import UserProfileTopBar from './components/UserProfileTopBar.jsx';
 import { DEPW_OFFICER_PROFILES } from './utils/workflowRules.js';
@@ -139,6 +140,7 @@ export default function App({ initialRouteTab = 'command' }) {
       'tracker',
       'flowchart',
       'waterlog',
+      'project',
       'presentation',
       'map',
       '3d',
@@ -343,6 +345,7 @@ export default function App({ initialRouteTab = 'command' }) {
     { id: 'flowchart', label: '3. 8-Step Flowchart', icon: GitBranch, essential: true },
     { id: 'map', label: '4. Street Map GIS', icon: Map, essential: true },
     { id: 'waterlog', label: '5. Water Quality Log', icon: Droplets, essential: true },
+    { id: 'project', label: '6. Custom Workflow Project', icon: FileText, essential: true },
     { id: 'presentation', label: '01–08 Presentation Deck', icon: Presentation, essential: false },
     { id: '3d', label: '3D Culvert & Truck Twin', icon: Box, essential: false },
     { id: 'ai', label: 'AI & Gmail Liaison Hub', icon: Sparkles, essential: false },
@@ -714,6 +717,13 @@ export default function App({ initialRouteTab = 'command' }) {
         {activeTab === 'bioscience' && <BioscienceLabView showToast={showToast} />}
 
         {activeTab === 'waterlog' && <WaterQualityZoneLogger showToast={showToast} />}
+
+        {activeTab === 'project' && (
+          <AutomatedProblemSolverProjectView
+            showToast={showToast}
+            onNavigateTab={(tab) => handleSelectNavTab(tab)}
+          />
+        )}
       </main>
 
       {/* Full-screen Glassmorphism TutorialManager Overlay */}

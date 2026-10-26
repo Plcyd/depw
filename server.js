@@ -25,6 +25,9 @@ import {
   IDENTIFIED_DRAINAGE_ZONES,
   validateWaterQualityEntry,
   evaluateWaterDrainageSafety,
+  DEPW_PRIVACY_CONSENT_NOTICE,
+  detectAndMaskSensitivePII,
+  sanitizeTicketPayloadPrivacy,
 } from './src/utils/workflowRules.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -446,10 +449,18 @@ export async function createApp() {
     }
   });
 
-  // Create New Ticket (with transaction & initial audit history)
+  // Create New Ticket (with transaction, Data Minimization & PII Masking, & initial audit history)
   app.post('/api/tickets', (req, res, next) => {
     try {
-      const parsed = CreateTicketSchema.safeParse(req.body);
+      const privacyCheck = sanitizeTicketPayloadPrivacy(req.body || {}, { requireConsent: false });
+      if (!privacyCheck.isValid) {
+        return res.status(400).json({
+          error: privacyCheck.errors[0],
+          details: privacyCheck.errors,
+        });
+      }
+
+      const parsed = CreateTicketSchema.safeParse(privacyCheck.sanitizedPayload);
       if (!parsed.success) {
         return res.status(400).json({
           error: 'Validation failed',
@@ -580,7 +591,8 @@ export async function createApp() {
         return res.status(404).json({ error: 'Ticket not found.' });
       }
 
-      const parsed = UpdateTicketSchema.safeParse(req.body);
+      const privacyCheck = sanitizeTicketPayloadPrivacy(req.body || {}, { requireConsent: false });
+      const parsed = UpdateTicketSchema.safeParse(privacyCheck.sanitizedPayload);
       if (!parsed.success) {
         return res.status(400).json({
           error: 'Validation failed',
@@ -895,46 +907,73 @@ export async function createApp() {
     }
   });
 
-  // Phase 3: AI Assistance — Draft Letter, Summarize, Missing-Info Check (with Rule-Based Fallback)
+  // Phase 3: AI Assistance — Draft Letter, Summarize, Missing-Info Check (with PII Masking & Rule-Based Fallback)
   app.post('/api/ai/assist', async (req, res) => {
-    const { mode = 'draft_letter', ticket = {}, customPrompt = '', modelTier = 'flash' } = req.body;
-    const baseLetter = generateSampleRequestLetter(ticket);
-    const completeness = evaluateRequestCompleteness(ticket);
+    const {
+      mode = 'draft_letter',
+      task,
+      ticket = {},
+      ticketData = {},
+      prompt = '',
+      customPrompt = '',
+      modelTier = 'flash',
+    } = req.body || {};
+
+    const effectiveMode = task || mode || 'draft_letter';
+    const rawTicket = Object.keys(ticket).length > 0 ? ticket : ticketData;
+    const privacySanitized = sanitizeTicketPayloadPrivacy(rawTicket, { requireConsent: false });
+    const safeTicket = privacySanitized.sanitizedPayload;
+    const promptRedaction = detectAndMaskSensitivePII(customPrompt || prompt || '');
+    const safeCustomPrompt = promptRedaction.sanitizedText;
+    const hadSensitivePii = privacySanitized.hasRedactions || promptRedaction.hasSensitivePII;
+
+    const baseLetter = generateSampleRequestLetter(safeTicket);
+    const completeness = evaluateRequestCompleteness(safeTicket);
     const allTickets = db.prepare('SELECT * FROM tickets').all();
-    const duplicates = findPotentialDuplicates(ticket, allTickets);
+    const duplicates = findPotentialDuplicates(safeTicket, allTickets);
+
+    const privacyGuardrailNotice = hadSensitivePii
+      ? '\n\n[DEPW Data Privacy & PII Masking Guardrail]: Sensitive personal identifiers (e.g., government IDs, tax numbers, passwords, birthdates, or financial accounts) were detected and automatically masked as [REDACTED SENSITIVE PII]. Under DEPW Data Minimization and No PII Disclosure guidelines, sensitive personal data is never stored or echoed back.'
+      : '';
 
     const ai = getGeminiClient();
     const modelMap = {
       lite: 'gemini-3.1-flash-lite',
+      fast: 'gemini-3.1-flash-lite',
       flash: 'gemini-3.8-flash',
       pro: 'gemini-4-argon',
+      thinking: 'gemini-4-argon',
     };
-    const selectedModel = modelMap[modelTier] || 'gemini-3.8-flash';
+    const selectedModel = modelMap[modelTier] || modelMap[req.body?.mode] || 'gemini-3.8-flash';
 
     if (!ai) {
+      const fallbackOut =
+        effectiveMode === 'summarize' || effectiveMode === 'status_memo'
+          ? `SUMMARY DRAFT (DEPW OFFICIAL LIAISON): Ticket ${safeTicket.ticketId || 'NEW'} from ${safeTicket.barangay || 'Sample Barangay'} (${safeTicket.district || 'Manila'}) requests ${safeTicket.requestType || 'Declogging'} at ${safeTicket.streetAddress || 'Sample Street'}. Current status: ${safeTicket.status || 'For Verification'}. Completeness score: ${completeness.score}%. Recommended next step: ${getExplainableNextStep(safeTicket.status).suggestedNextStep}.${privacyGuardrailNotice}`
+          : `${baseLetter.bodyTagalog}\n\n[English Liaison Translation Draft]: We respectfully request assistance from the Department of Engineering and Public Works (DEPW) to conduct ${safeTicket.requestType || 'declogging'} operations along the drainage line at ${safeTicket.streetAddress || 'Sample Street'}, ${safeTicket.barangay || 'Barangay 123'}. Silt and debris accumulation has been observed affecting water flow. We request technical inspection and coordination for a possible schedule.${privacyGuardrailNotice}`;
+
       return res.json({
         source: 'rule_based_fallback',
-        modelUsed: 'Rule-Based Engine (No API Key Configured)',
+        modelUsed: 'Rule-Based Engine (Privacy-Protected)',
         draftBadge: 'DRAFT — RULE-BASED ASSISTANCE (REQUIRES HUMAN REVIEW)',
         completeness,
         duplicates,
-        output:
-          mode === 'summarize'
-            ? `SUMMARY DRAFT (FICTIONAL DEMO): Ticket ${ticket.ticketId || 'NEW'} from ${ticket.barangay || 'Sample Barangay'} (${ticket.district || 'Manila'}) requests ${ticket.requestType || 'Declogging'} at ${ticket.streetAddress || 'Sample Street'}. Current status: ${ticket.status || 'For Verification'}. Completeness score: ${completeness.score}%. Recommended next step: ${getExplainableNextStep(ticket.status).suggestedNextStep}.`
-            : `${baseLetter.bodyTagalog}\n\n[English Liaison Translation Draft]: We respectfully request assistance from the Department of Engineering Office to conduct ${ticket.requestType || 'declogging'} operations along the drainage line at ${ticket.streetAddress || 'Sample Street'}, ${ticket.barangay || 'Barangay 123 SAMPLE'}. Silt and debris accumulation has been observed affecting water flow. We request technical inspection and coordination for a possible schedule.`,
+        piiRedacted: hadSensitivePii,
+        output: fallbackOut,
+        result: fallbackOut,
       });
     }
 
     try {
       const systemInstruction =
-        'You are an administrative liaison assistant for the Department of Engineering and Public Works (Manila) training demonstration. Always use fictional sample data only. Clearly label all outputs as DRAFT requiring human verification. Never claim a request is officially approved or dispatched.';
+        'You are an administrative liaison assistant for the Department of Engineering and Public Works (DEPW Manila). Strictly enforce DEPW Data Privacy & Protection Guidelines: (1) Purpose Limitation & Data Minimization: never request or output birthdates, private home addresses, financial details, or government ID numbers. (2) No PII Disclosure: if any sensitive personal identifier appears, never echo or repeat it back; use [REDACTED SENSITIVE PII]. (3) Remind users in public Viber/Facebook threads to share contact details via direct message or official DEPW forms. Clearly label outputs as DRAFT requiring human verification.';
 
       const userPrompt =
-        mode === 'summarize'
-          ? `Summarize this fictional barangay declogging ticket for an engineering supervisor, check for missing information, and explain the recommended next workflow step:\n${JSON.stringify(ticket, null, 2)}\n${customPrompt}`
-          : mode === 'missing_check'
-          ? `Perform a missing-information and data-quality audit on this fictional barangay drainage request, listing what the Barangay Liaison Officer should verify before engineering endorsement:\n${JSON.stringify(ticket, null, 2)}`
-          : `Draft a formal, respectful Filipino (Tagalog) and English Barangay Declogging Request Letter and DEO Liaison Endorsement Memo for this fictional request:\n${JSON.stringify(ticket, null, 2)}\n${customPrompt}`;
+        effectiveMode === 'summarize' || effectiveMode === 'status_memo'
+          ? `Summarize this barangay declogging ticket for an engineering supervisor, check for missing information, and explain the recommended next workflow step:\n${JSON.stringify(safeTicket, null, 2)}\n${safeCustomPrompt}`
+          : effectiveMode === 'missing_check' || effectiveMode === 'missing_info'
+          ? `Perform a missing-information and data-quality audit on this barangay drainage request, listing what the Barangay Liaison Officer should verify before engineering endorsement:\n${JSON.stringify(safeTicket, null, 2)}`
+          : `Draft a formal, respectful Filipino (Tagalog) and English Barangay Declogging Request Letter and DEPW Liaison Endorsement Memo for this request:\n${JSON.stringify(safeTicket, null, 2)}\n${safeCustomPrompt}`;
 
       const response = await ai.models.generateContent({
         model: selectedModel,
@@ -944,22 +983,31 @@ export async function createApp() {
         },
       });
 
+      const finalOutput =
+        detectAndMaskSensitivePII(response.text || baseLetter.bodyTagalog).sanitizedText +
+        privacyGuardrailNotice;
+
       res.json({
         source: 'gemini_api',
         modelUsed: selectedModel,
         draftBadge: `AI-GENERATED DRAFT (${selectedModel}) • HUMAN VERIFICATION REQUIRED`,
         completeness,
         duplicates,
-        output: response.text || baseLetter.bodyTagalog,
+        piiRedacted: hadSensitivePii,
+        output: finalOutput,
+        result: finalOutput,
       });
     } catch (err) {
+      const fallbackText = `${baseLetter.bodyTagalog}\n\n[Liaison Summary]: Request from ${baseLetter.from} (${baseLetter.through}) regarding ${baseLetter.subject}. Completeness: ${completeness.score}%.${privacyGuardrailNotice}`;
       res.json({
         source: 'rule_based_fallback',
         modelUsed: `Rule-Based Fallback (${err instanceof Error ? err.message.slice(0, 80) : 'API unavailable'})`,
         draftBadge: 'DRAFT — RULE-BASED FALLBACK (REQUIRES HUMAN REVIEW)',
         completeness,
         duplicates,
-        output: `${baseLetter.bodyTagalog}\n\n[Liaison Summary]: Request from ${baseLetter.from} (${baseLetter.through}) regarding ${baseLetter.subject}. Completeness: ${completeness.score}%.`,
+        piiRedacted: hadSensitivePii,
+        output: fallbackText,
+        result: fallbackText,
       });
     }
   });

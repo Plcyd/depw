@@ -337,6 +337,41 @@ export default function CommandCenterView({
               </div>
             </div>
           </div>
+
+          {/* Featured Project & Data Privacy Compliance Strip */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3 pt-3 border-t border-[var(--glass-border)]">
+            <div
+              onClick={() => onNavigateTab?.('project')}
+              className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-400/35 hover:border-amber-400/60 transition cursor-pointer flex items-center justify-between gap-3"
+            >
+              <div>
+                <div className="text-[11px] font-mono font-bold text-amber-300 uppercase tracking-wider">
+                  STEP-BY-STEP WORKFLOW PROJECT • 4 SETS • 11 ITEMS • 250 TOTAL SCORE
+                </div>
+                <div className="text-sm font-extrabold text-white mt-0.5">
+                  Automated Problem-Solver Project – Design Your Custom Workflow
+                </div>
+                <div className="text-xs text-slate-300 mt-0.5">
+                  Design a complete, step-by-step workflow using automation (Max 4 members/group, or 2 workflows if &gt;4 members)
+                </div>
+              </div>
+              <span className="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 text-xs font-extrabold whitespace-nowrap shrink-0">
+                TAKE QUIZ →
+              </span>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-400/35 flex items-start gap-3">
+              <ShieldCheck size={20} className="text-emerald-400 shrink-0 mt-0.5" />
+              <div className="text-xs text-slate-200 leading-relaxed">
+                <div className="font-bold text-emerald-300 uppercase tracking-wider text-[11px]">
+                  DEPW Data Privacy & Protection Guardrails Active
+                </div>
+                <p className="mt-0.5 text-slate-300">
+                  “By providing your contact details, you consent to DEPW processing your information solely for verifying and coordinating this service request under our public service privacy guidelines.”
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
