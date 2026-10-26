@@ -1434,5 +1434,288 @@ export function getManilaSpatialDrainageContext(query = '') {
   };
 }
 
+/**
+ * Identified Drainage Zones in the City of Manila for Water Quality Logging & Visualization
+ */
+export const IDENTIFIED_DRAINAGE_ZONES = [
+  {
+    zoneId: 'ZONE-TONDO-VITAS',
+    zoneName: 'Estero de Vitas Outfall & Service Rd.',
+    district: 'Tondo',
+    legislativeDistrict: '1st District',
+    waterwayType: 'Trunk Estero & Box Culvert Outfall',
+    latitude: 14.6195,
+    longitude: 120.9678,
+  },
+  {
+    zoneId: 'ZONE-SAMPALOC-ESPANA',
+    zoneName: 'España Blvd. cor. Maceda Box Culvert',
+    district: 'Sampaloc',
+    legislativeDistrict: '4th District',
+    waterwayType: 'Arterial Lateral Box Culvert',
+    latitude: 14.6110,
+    longitude: 120.9955,
+  },
+  {
+    zoneId: 'ZONE-ERMITA-FAURA',
+    zoneName: 'Padre Faura – Taft Ave. Storm Interceptor',
+    district: 'Ermita',
+    legislativeDistrict: '5th District',
+    waterwayType: 'Reinforced Concrete Storm Drain',
+    latitude: 14.5826,
+    longitude: 120.9822,
+  },
+  {
+    zoneId: 'ZONE-QUIAPO-HIDALGO',
+    zoneName: 'Estero de Quiapo / Hidalgo Covered Canal',
+    district: 'Quiapo',
+    legislativeDistrict: '3rd District',
+    waterwayType: 'Covered Masonry Drainage Channel',
+    latitude: 14.5994,
+    longitude: 120.9848,
+  },
+  {
+    zoneId: 'ZONE-BINONDO-REINA',
+    zoneName: 'Estero de Binondo & Estero de la Reina',
+    district: 'Binondo',
+    legislativeDistrict: '3rd District',
+    waterwayType: 'Tidal Gate Canal & Silt Trap',
+    latitude: 14.6010,
+    longitude: 120.9745,
+  },
+  {
+    zoneId: 'ZONE-PACO-LINEAR',
+    zoneName: 'Estero de Paco Rehabilitation Corridor',
+    district: 'Paco',
+    legislativeDistrict: '5th District',
+    waterwayType: 'Bio-Retention Estero & Pumping Outfall',
+    latitude: 14.5805,
+    longitude: 120.9964,
+  },
+  {
+    zoneId: 'ZONE-STAMESA-TERESA',
+    zoneName: 'Old Sta. Mesa – San Juan River Outfall',
+    district: 'Santa Mesa',
+    legislativeDistrict: '6th District',
+    waterwayType: 'Lateral Storm Line & Manhole Network',
+    latitude: 14.6018,
+    longitude: 121.0124,
+  },
+  {
+    zoneId: 'ZONE-INTRAMUROS-LAWTON',
+    zoneName: 'Lawton Underpass & Pasig River Outfall',
+    district: 'Intramuros',
+    legislativeDistrict: '5th District',
+    waterwayType: 'Subsurface Sump & Gravity Outfall',
+    latitude: 14.5896,
+    longitude: 120.9747,
+  },
+];
 
+export const INITIAL_WATER_QUALITY_LOGS = [
+  {
+    logId: 'WQL-2026-001',
+    zoneId: 'ZONE-PACO-LINEAR',
+    zoneName: 'Estero de Paco Rehabilitation Corridor',
+    district: 'Paco',
+    dissolvedOxygen: 6.5,
+    h2sPpm: 1.8,
+    turbidityNtu: 24,
+    ammoniaMgL: 1.1,
+    flowIndex: 94,
+    pH: 7.3,
+    waterTempC: 28.2,
+    overallStatus: 'NORMAL',
+    inspectorName: 'Engr. Camille R. Aquino',
+    notes: 'Post-desilting verification complete; bio-filtration corridor flowing clearly toward Pasig River.',
+    recordedAt: '2026-10-23T08:15:00.000Z',
+  },
+  {
+    logId: 'WQL-2026-002',
+    zoneId: 'ZONE-SAMPALOC-ESPANA',
+    zoneName: 'España Blvd. cor. Maceda Box Culvert',
+    district: 'Sampaloc',
+    dissolvedOxygen: 5.4,
+    h2sPpm: 2.6,
+    turbidityNtu: 38,
+    ammoniaMgL: 1.5,
+    flowIndex: 82,
+    pH: 7.1,
+    waterTempC: 28.8,
+    overallStatus: 'NORMAL',
+    inspectorName: 'Engr. Marco P. Del Rosario',
+    notes: 'Lateral curb inlets cleared of leaf litter; steady hydraulic conveyance observed.',
+    recordedAt: '2026-10-23T09:40:00.000Z',
+  },
+  {
+    logId: 'WQL-2026-003',
+    zoneId: 'ZONE-TONDO-VITAS',
+    zoneName: 'Estero de Vitas Outfall & Service Rd.',
+    district: 'Tondo',
+    dissolvedOxygen: 4.3,
+    h2sPpm: 6.4,
+    turbidityNtu: 64,
+    ammoniaMgL: 2.3,
+    flowIndex: 62,
+    pH: 6.8,
+    waterTempC: 29.4,
+    overallStatus: 'WARNING',
+    inspectorName: 'Engr. Lorenzo T. Macapagal',
+    notes: 'Elevated silt turbidity and moderate H2S gas pocket detected near Velasquez St.; vent manhole prior to vacuum suction.',
+    recordedAt: '2026-10-23T11:05:00.000Z',
+  },
+  {
+    logId: 'WQL-2026-004',
+    zoneId: 'ZONE-QUIAPO-HIDALGO',
+    zoneName: 'Estero de Quiapo / Hidalgo Covered Canal',
+    district: 'Quiapo',
+    dissolvedOxygen: 2.7,
+    h2sPpm: 11.2,
+    turbidityNtu: 86,
+    ammoniaMgL: 3.4,
+    flowIndex: 44,
+    pH: 6.5,
+    waterTempC: 30.1,
+    overallStatus: 'CRITICAL',
+    inspectorName: 'Engr. Mateo R. Santos',
+    notes: 'Heavy market grease and organic silt obstruction inside covered masonry culvert; mandatory forced ventilation and PPE required.',
+    recordedAt: '2026-10-23T13:20:00.000Z',
+  },
+  {
+    logId: 'WQL-2026-005',
+    zoneId: 'ZONE-ERMITA-FAURA',
+    zoneName: 'Padre Faura – Taft Ave. Storm Interceptor',
+    district: 'Ermita',
+    dissolvedOxygen: 5.8,
+    h2sPpm: 2.2,
+    turbidityNtu: 31,
+    ammoniaMgL: 1.4,
+    flowIndex: 87,
+    pH: 7.2,
+    waterTempC: 28.4,
+    overallStatus: 'NORMAL',
+    inspectorName: 'Engr. Camille R. Aquino',
+    notes: 'Routine storm interceptor check; catch basins unobstructed ahead of afternoon rain forecast.',
+    recordedAt: '2026-10-23T14:50:00.000Z',
+  },
+  {
+    logId: 'WQL-2026-006',
+    zoneId: 'ZONE-BINONDO-REINA',
+    zoneName: 'Estero de Binondo & Estero de la Reina',
+    district: 'Binondo',
+    dissolvedOxygen: 4.7,
+    h2sPpm: 5.3,
+    turbidityNtu: 55,
+    ammoniaMgL: 2.1,
+    flowIndex: 68,
+    pH: 6.9,
+    waterTempC: 29.1,
+    overallStatus: 'WARNING',
+    inspectorName: 'Engr. Marco P. Del Rosario',
+    notes: 'High-tide backwater slowing discharge; scheduled silt trap desilting with Crew 2.',
+    recordedAt: '2026-10-23T16:10:00.000Z',
+  },
+];
 
+/**
+ * Validates and evaluates a new Water Quality Parameter entry for an Identified Drainage Zone.
+ * Never silently substitutes fallback numbers when required inputs are empty or invalid.
+ */
+export function validateWaterQualityEntry(input = {}) {
+  const errors = [];
+
+  const zoneId = String(input.zoneId || '').trim();
+  const matchedZone = IDENTIFIED_DRAINAGE_ZONES.find((z) => z.zoneId === zoneId);
+  const zoneName = String(input.zoneName || matchedZone?.zoneName || '').trim();
+  const district = String(input.district || matchedZone?.district || '').trim();
+  const inspectorName = String(input.inspectorName || '').trim();
+  const notes = String(input.notes || '').trim();
+
+  if (!zoneId && !zoneName) {
+    errors.push('Please select an identified drainage zone.');
+  }
+  if (!district) {
+    errors.push('Manila district is required.');
+  }
+  if (!inspectorName || inspectorName.length < 2) {
+    errors.push('Inspector / Observer name is required (at least 2 characters).');
+  }
+
+  const parseNumericField = (rawVal, label, min, max) => {
+    if (rawVal === undefined || rawVal === null || String(rawVal).trim() === '') {
+      errors.push(`${label} is required.`);
+      return null;
+    }
+    const num = Number(rawVal);
+    if (Number.isNaN(num) || !Number.isFinite(num)) {
+      errors.push(`${label} must be a valid number.`);
+      return null;
+    }
+    if (num < min || num > max) {
+      errors.push(`${label} must be between ${min} and ${max}.`);
+      return null;
+    }
+    return Number(num.toFixed(2));
+  };
+
+  const dissolvedOxygen = parseNumericField(input.dissolvedOxygen, 'Dissolved Oxygen (mg/L)', 0, 25);
+  const h2sPpm = parseNumericField(input.h2sPpm, 'H2S Culvert Gas (ppm)', 0, 200);
+  const turbidityNtu = parseNumericField(input.turbidityNtu, 'Suspended Turbidity (NTU)', 0, 1000);
+  const ammoniaMgL = parseNumericField(input.ammoniaMgL, 'Ammonia (mg/L)', 0, 100);
+  const flowIndex = parseNumericField(input.flowIndex, 'Hydraulic Flow Efficiency (%)', 0, 100);
+
+  const pH =
+    input.pH !== undefined && input.pH !== null && String(input.pH).trim() !== ''
+      ? parseNumericField(input.pH, 'pH Level', 0, 14)
+      : 7.2;
+
+  const waterTempC =
+    input.waterTempC !== undefined && input.waterTempC !== null && String(input.waterTempC).trim() !== ''
+      ? parseNumericField(input.waterTempC, 'Water Temperature (°C)', 0, 60)
+      : 28.5;
+
+  if (errors.length > 0) {
+    return {
+      isValid: false,
+      errors,
+      entry: null,
+      evaluation: null,
+    };
+  }
+
+  const evaluation = evaluateWaterDrainageSafety({
+    dissolvedOxygen,
+    h2sPpm,
+    turbidityNtu,
+    ammoniaMgL,
+    flowIndex,
+  });
+
+  const recordedAt = input.recordedAt || new Date().toISOString();
+  const logId = input.logId || `WQL-2026-${String(Math.floor(100 + Math.random() * 900))}`;
+
+  const entry = {
+    logId,
+    zoneId: zoneId || 'ZONE-CUSTOM',
+    zoneName,
+    district,
+    dissolvedOxygen,
+    h2sPpm,
+    turbidityNtu,
+    ammoniaMgL,
+    flowIndex,
+    pH: pH ?? 7.2,
+    waterTempC: waterTempC ?? 28.5,
+    overallStatus: evaluation.overallStatus,
+    inspectorName,
+    notes: notes || 'Field water quality parameter reading logged via DEPW Assist.',
+    recordedAt,
+  };
+
+  return {
+    isValid: true,
+    errors: [],
+    entry,
+    evaluation,
+  };
+}

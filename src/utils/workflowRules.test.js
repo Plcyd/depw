@@ -216,4 +216,48 @@ test('evaluateWaterDrainageSafety flags NORMAL, WARNING, and CRITICAL thresholds
   assert.equal(critResult.criticalCount, 5);
 });
 
+test('validateWaterQualityEntry validates identified drainage zone water quality parameters and classifies safety', async () => {
+  const { IDENTIFIED_DRAINAGE_ZONES, INITIAL_WATER_QUALITY_LOGS, validateWaterQualityEntry } = await import('./workflowRules.js');
+  assert.ok(IDENTIFIED_DRAINAGE_ZONES.length >= 8);
+  assert.ok(INITIAL_WATER_QUALITY_LOGS.length >= 6);
 
+  // Rejects empty/missing required fields
+  const invalidRes = validateWaterQualityEntry({
+    zoneId: '',
+    dissolvedOxygen: '',
+    h2sPpm: 'abc',
+    inspectorName: '',
+  });
+  assert.equal(invalidRes.isValid, false);
+  assert.ok(invalidRes.errors.length >= 3);
+
+  // Accepts valid readings and computes overallStatus accurately
+  const validRes = validateWaterQualityEntry({
+    zoneId: 'ZONE-TONDO-VITAS',
+    dissolvedOxygen: 6.2,
+    h2sPpm: 2.1,
+    turbidityNtu: 32,
+    ammoniaMgL: 1.3,
+    flowIndex: 89,
+    pH: 7.2,
+    inspectorName: 'Engr. Camille R. Aquino',
+    notes: 'Clear tidal outflow',
+  });
+  assert.equal(validRes.isValid, true);
+  assert.equal(validRes.entry.zoneName, 'Estero de Vitas Outfall & Service Rd.');
+  assert.equal(validRes.entry.district, 'Tondo');
+  assert.equal(validRes.entry.overallStatus, 'NORMAL');
+
+  // Flags CRITICAL when H2S >= 10 ppm or DO <= 3.0 mg/L
+  const critEntryRes = validateWaterQualityEntry({
+    zoneId: 'ZONE-QUIAPO-HIDALGO',
+    dissolvedOxygen: 2.4,
+    h2sPpm: 11.5,
+    turbidityNtu: 85,
+    ammoniaMgL: 3.2,
+    flowIndex: 42,
+    inspectorName: 'Engr. Mateo R. Santos',
+  });
+  assert.equal(critEntryRes.isValid, true);
+  assert.equal(critEntryRes.entry.overallStatus, 'CRITICAL');
+});

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Presentation,
   Table2,
@@ -7,19 +8,19 @@ import {
   Sparkles,
   FlaskConical,
   BarChart3,
-  Palette,
   Menu,
   X,
   LogIn,
   LogOut,
   GitBranch,
   HelpCircle,
-  Eye,
-  Type,
   Sliders,
   Search,
   Navigation,
   RotateCcw,
+  FileText,
+  Layers,
+  Droplets,
 } from 'lucide-react';
 import styles from './styles/GlassSystem.module.css';
 import PresentationDeck from './components/PresentationDeck.jsx';
@@ -36,15 +37,34 @@ import StreetMapView from './components/StreetMapView.jsx';
 import Drainage3DView from './components/Drainage3DView.jsx';
 import AiLiaisonHubView from './components/AiLiaisonHubView.jsx';
 import BioscienceLabView from './components/BioscienceLabView.jsx';
-import { APP_THEMES } from './utils/workflowRules.js';
+import WaterQualityZoneLogger from './components/WaterQualityZoneLogger.jsx';
+import ThemeSwitcher from './components/ThemeSwitcher.jsx';
+import SimpleGuideModal from './components/SimpleGuideModal.jsx';
 import { api } from './services/api.js';
 import { initAuth, googleSignIn, logout } from './services/firebaseClient.js';
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('command'); // 'command' | 'presentation' | 'tracker' | 'map' | '3d' | 'ai' | 'bioscience'
+export default function App({ initialRouteTab = 'command' }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState(initialRouteTab || 'command');
+  const [simpleNavMode, setSimpleNavMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('depw_simple_nav');
+      return saved === null ? true : saved === 'true';
+    } catch {
+      return true;
+    }
+  });
+  const [titaNerryGuideOpen, setTitaNerryGuideOpen] = useState(false);
+
   const [themeId, setThemeId] = useState(() => {
     try {
-      return localStorage.getItem('depw_theme_id') || 'navy-glass';
+      return (
+        localStorage.getItem('depw_theme_id') ||
+        localStorage.getItem('theme') ||
+        'navy-glass'
+      );
     } catch {
       return 'navy-glass';
     }
@@ -97,14 +117,45 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState(null);
 
+  // Sync route pathname changes with activeTab
+  useEffect(() => {
+    const path = location?.pathname?.replace('/', '') || '';
+    const validTabs = [
+      'command',
+      'tracker',
+      'flowchart',
+      'waterlog',
+      'presentation',
+      'map',
+      '3d',
+      'ai',
+      'bioscience',
+    ];
+    if (validTabs.includes(path) && path !== activeTab) {
+      setActiveTab(path);
+    }
+  }, [location?.pathname]);
+
   useEffect(() => {
     try {
       localStorage.setItem('depw_theme_id', themeId);
+      localStorage.setItem('theme', themeId);
     } catch {
       // ignore storage errors
     }
     document.documentElement.setAttribute('data-theme', themeId);
+    if (document.body) {
+      document.body.setAttribute('data-theme', themeId);
+    }
   }, [themeId]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('depw_simple_nav', String(simpleNavMode));
+    } catch {
+      // ignore
+    }
+  }, [simpleNavMode]);
 
   useEffect(() => {
     try {
@@ -263,20 +314,30 @@ export default function App() {
     showToast('Signed out of Google Workspace session.', 'info');
   };
 
-  const navItems = [
-    { id: 'command', label: 'Command Center', icon: BarChart3 },
-    { id: 'tracker', label: 'Smart Tracker & Audit', icon: Table2 },
-    { id: 'flowchart', label: 'Workflow Flowchart', icon: GitBranch },
-    { id: 'presentation', label: '01–08 Presentation Deck', icon: Presentation },
-    { id: 'map', label: 'Manila Street Map GIS', icon: Map },
-    { id: '3d', label: '3D Culvert & Truck Twin', icon: Box },
-    { id: 'ai', label: 'AI & Gmail Liaison Hub', icon: Sparkles },
-    { id: 'bioscience', label: 'Water & Bioscience Lab', icon: FlaskConical },
+  const allNavItems = [
+    { id: 'command', label: '1. Main Dashboard', icon: BarChart3, essential: true },
+    { id: 'tracker', label: '2. Request Tracker', icon: Table2, essential: true },
+    { id: 'flowchart', label: '3. 8-Step Flowchart', icon: GitBranch, essential: true },
+    { id: 'map', label: '4. Street Map GIS', icon: Map, essential: true },
+    { id: 'waterlog', label: '5. Water Quality Log', icon: Droplets, essential: true },
+    { id: 'presentation', label: '01–08 Presentation Deck', icon: Presentation, essential: false },
+    { id: '3d', label: '3D Culvert & Truck Twin', icon: Box, essential: false },
+    { id: 'ai', label: 'AI & Gmail Liaison Hub', icon: Sparkles, essential: false },
+    { id: 'bioscience', label: 'Water & Bioscience Lab', icon: FlaskConical, essential: false },
   ];
+
+  const visibleNavItems = simpleNavMode
+    ? allNavItems.filter((item) => item.essential || item.id === activeTab)
+    : allNavItems;
 
   const handleSelectNavTab = (tabId) => {
     setActiveTab(tabId);
     setMobileMenuOpen(false);
+    try {
+      navigate(tabId === 'command' ? '/' : `/${tabId}`);
+    } catch {
+      // ignore if outside router context
+    }
   };
 
   return (
@@ -325,21 +386,30 @@ export default function App() {
           </div>
         </div>
 
-        {/* Right Actions: Search (Cmd+K) + Journey Replay + Field Inspection + Settings & Accessibility + Guide + Theme + Auth */}
+        {/* Right Actions: Tita Nerry Guide (.TXT) + Tutorial + Journey Replay + Settings + ThemeSwitcher + Auth */}
         <div className={styles.headerRightActions}>
-          {/* Quick Search & Jump (Cmd+K) */}
+          {/* Tita Nerry Simple How-To Guide (.TXT) */}
           <button
             type="button"
-            onClick={() => setCommandPaletteOpen(true)}
+            onClick={() => setTitaNerryGuideOpen(true)}
             className={styles.secondaryBtn}
             style={{ padding: '7px 11px', fontSize: '12px' }}
-            title="Global Command Palette (Ctrl+K / Cmd+K)"
+            title="Gabay para kay Tita Nerry (HOW_TO_USE_FOR_TITA_NERRY.txt)"
           >
-            <Search size={14} className="text-cyan-400" />
-            <span className="hidden md:inline">Quick Jump</span>
-            <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono rounded bg-white/10 border border-white/20 text-cyan-200">
-              ⌘K
-            </kbd>
+            <FileText size={14} className="text-amber-400" />
+            <span>Tita Nerry Guide (.TXT)</span>
+          </button>
+
+          {/* Step-by-Step Guide / Replay Tutorial Modal Button */}
+          <button
+            type="button"
+            onClick={() => setTutorialOpen(true)}
+            className={styles.secondaryBtn}
+            style={{ padding: '7px 11px', fontSize: '12px' }}
+            title="Interactive Step-by-Step Tutorial / Gabay sa Paggamit"
+          >
+            <HelpCircle size={14} className="text-cyan-400" />
+            <span>Tutorial</span>
           </button>
 
           {/* Request Journey Replay Tool */}
@@ -354,16 +424,16 @@ export default function App() {
             <span className="hidden sm:inline">Journey Replay</span>
           </button>
 
-          {/* Mobile Field Inspection Tool */}
+          {/* Quick Search & Jump (Cmd+K) */}
           <button
             type="button"
-            onClick={() => setFieldInspectionOpen(true)}
+            onClick={() => setCommandPaletteOpen(true)}
             className={styles.secondaryBtn}
             style={{ padding: '7px 11px', fontSize: '12px' }}
-            title="Field Inspection Checklist & GPS Verification Tool"
+            title="Global Command Palette (Ctrl+K / Cmd+K)"
           >
-            <Navigation size={14} className="text-emerald-400" />
-            <span className="hidden sm:inline">Field Tool</span>
+            <Search size={14} className="text-cyan-400" />
+            <span className="hidden xl:inline">Search</span>
           </button>
 
           {/* Accessibility & Visual Settings Modal Trigger */}
@@ -378,45 +448,12 @@ export default function App() {
             <span className="hidden sm:inline">Settings</span>
           </button>
 
-          {/* Step-by-Step Guide / Replay Tutorial Modal Button */}
-          <button
-            type="button"
-            onClick={() => setTutorialOpen(true)}
-            className={styles.secondaryBtn}
-            style={{ padding: '7px 11px', fontSize: '12px' }}
-            title="Interactive Beginner Guide / Gabay sa Paggamit"
-          >
-            <HelpCircle size={14} className="text-cyan-400" />
-            <span className="hidden sm:inline">Guide</span>
-            <span className="sm:hidden">Guide</span>
-          </button>
-
-          {/* Theme Selector (7 Themes with 3 Light Themes) */}
-          <div className="flex items-center gap-1.5 bg-slate-950/70 border border-sky-400/25 rounded-lg px-2 py-1">
-            <Palette size={13} className="text-cyan-300 shrink-0" />
-            <label htmlFor="theme-selector" className="sr-only">
-              Select Visual Theme
-            </label>
-            <select
-              id="theme-selector"
-              aria-label="Select Visual Theme"
-              value={themeId}
-              onChange={(e) => {
-                setThemeId(e.target.value);
-                const selected = APP_THEMES.find((t) => t.id === e.target.value);
-                if (selected) {
-                  showToast(`Activated theme: ${selected.name} (${selected.badge})`, 'info');
-                }
-              }}
-              className="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer"
-            >
-              {APP_THEMES.map((t) => (
-                <option key={t.id} value={t.id} className="bg-slate-900 text-white">
-                  {t.isLight ? '☀️ ' : '🌙 '} {t.name} ({t.badge})
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Dedicated Theme Switcher (Navy Glass / Daylight Civic + 7 CSS data-themes persisted in localStorage) */}
+          <ThemeSwitcher
+            themeId={themeId}
+            onThemeChange={(nextId) => setThemeId(nextId)}
+            showToast={showToast}
+          />
 
           {user ? (
             <button
@@ -437,7 +474,7 @@ export default function App() {
               onClick={handleSignIn}
             >
               <LogIn size={14} />
-              <span>Workspace Sign In</span>
+              <span>Sign In</span>
             </button>
           )}
 
@@ -459,7 +496,7 @@ export default function App() {
           className={`${styles.mainNavStrip} ${mobileMenuOpen ? styles.mainNavStripOpen : ''}`}
           aria-label="Primary Workspace Navigation"
         >
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
@@ -474,6 +511,35 @@ export default function App() {
               </button>
             );
           })}
+
+          {/* Toggle between Simple 4-Tab View and Full 8-Tool Engineering View */}
+          <button
+            type="button"
+            onClick={() => {
+              setSimpleNavMode((prev) => {
+                const next = !prev;
+                showToast(
+                  next
+                    ? 'Simple View activated: Showing the 4 essential tabs.'
+                    : 'Full Engineering View activated: Showing all 8 tools.',
+                  'info'
+                );
+                return next;
+              });
+            }}
+            className={styles.navTabBtn}
+            style={{
+              marginLeft: 'auto',
+              borderStyle: 'dashed',
+              opacity: 0.92,
+            }}
+            title="Toggle between Simple 4-Tab Menu and Full 8-Tab Engineering Menu"
+          >
+            <Layers size={14} />
+            <span>
+              {simpleNavMode ? 'Show All 8 Tools (+4)' : 'Simple View (4 Tabs)'}
+            </span>
+          </button>
         </nav>
       </header>
 
@@ -513,14 +579,15 @@ export default function App() {
             onOpenTicketAudit={(ticketId) => {
               setFocusedTrackerTicketId(ticketId);
               setInitialInspectorTab('audit');
-              setActiveTab('tracker');
+              handleSelectNavTab('tracker');
             }}
-            onOpenSmartTracker={() => setActiveTab('tracker')}
+            onOpenSmartTracker={() => handleSelectNavTab('tracker')}
             onOpenJourneyReplay={(ticketId) => {
               setJourneyReplayTicketId(ticketId || focusedTrackerTicketId);
             }}
             onOpenTutorial={() => setTutorialOpen(true)}
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onOpenTitaNerryGuide={() => setTitaNerryGuideOpen(true)}
+            onNavigateTab={(tab) => handleSelectNavTab(tab)}
             showToast={showToast}
           />
         )}
@@ -530,7 +597,7 @@ export default function App() {
             tickets={tickets}
             onNavigateToTracker={(status) => {
               setTrackerStatusFilter(status);
-              setActiveTab('tracker');
+              handleSelectNavTab('tracker');
             }}
             showToast={showToast}
           />
@@ -539,14 +606,14 @@ export default function App() {
         {activeTab === 'presentation' && (
           <PresentationDeck
             tickets={tickets}
-            onOpenSmartTracker={() => setActiveTab('tracker')}
+            onOpenSmartTracker={() => handleSelectNavTab('tracker')}
             onSelectTicketForMap={(ticket) => {
               setSelectedMapTicket(ticket);
-              setActiveTab('map');
+              handleSelectNavTab('map');
             }}
             onOpenCreateModal={() => {
               setInitialOpenCreate(true);
-              setActiveTab('tracker');
+              handleSelectNavTab('tracker');
             }}
           />
         )}
@@ -557,10 +624,10 @@ export default function App() {
             onRefreshTickets={fetchAllData}
             onSelectTicketForMap={(ticket) => {
               setSelectedMapTicket(ticket);
-              setActiveTab('map');
+              handleSelectNavTab('map');
             }}
             onOpenLetterStudioWithTicket={() => {
-              setActiveTab('ai');
+              handleSelectNavTab('ai');
             }}
             onOpenJourneyReplay={(ticketId) => {
               setJourneyReplayTicketId(ticketId || focusedTrackerTicketId);
@@ -582,11 +649,11 @@ export default function App() {
               if (ticket?.ticketId) {
                 setFocusedTrackerTicketId(ticket.ticketId);
               }
-              setActiveTab('tracker');
+              handleSelectNavTab('tracker');
             }}
             onUseCoordinatesForNewTicket={() => {
               setInitialOpenCreate(true);
-              setActiveTab('tracker');
+              handleSelectNavTab('tracker');
             }}
             showToast={showToast}
           />
@@ -604,7 +671,22 @@ export default function App() {
         )}
 
         {activeTab === 'bioscience' && <BioscienceLabView showToast={showToast} />}
+
+        {activeTab === 'waterlog' && <WaterQualityZoneLogger showToast={showToast} />}
       </main>
+
+      {/* Simple User Manual & .TXT Guide Modal for Tita Nerry */}
+      <SimpleGuideModal
+        isOpen={titaNerryGuideOpen}
+        onClose={() => setTitaNerryGuideOpen(false)}
+        onOpenTutorial={() => setTutorialOpen(true)}
+        onOpenFlowchart={() => handleSelectNavTab('flowchart')}
+        onToggleTheme={(nextTheme) => setThemeId(nextTheme)}
+        currentTheme={themeId}
+        simpleNavMode={simpleNavMode}
+        onToggleSimpleNav={() => setSimpleNavMode((prev) => !prev)}
+        showToast={showToast}
+      />
 
       {/* Full-screen Glassmorphism TutorialManager Overlay */}
       <TutorialManager
@@ -662,15 +744,12 @@ export default function App() {
         isOpen={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
         tickets={tickets}
-        onNavigateTab={(tab) => {
-          setActiveTab(tab);
-          setMobileMenuOpen(false);
-        }}
+        onNavigateTab={(tab) => handleSelectNavTab(tab)}
         onSelectTicket={(ticket) => {
           if (ticket?.ticketId) {
             setFocusedTrackerTicketId(ticket.ticketId);
           }
-          setActiveTab('tracker');
+          handleSelectNavTab('tracker');
         }}
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenTutorial={() => setTutorialOpen(true)}
@@ -704,7 +783,7 @@ export default function App() {
       <nav className={styles.mobileBottomNav} aria-label="Mobile Navigation Bar">
         <button
           type="button"
-          onClick={() => setActiveTab('command')}
+          onClick={() => handleSelectNavTab('command')}
           className={`${styles.bottomNavBtn} ${activeTab === 'command' ? styles.bottomNavBtnActive : ''}`}
         >
           <BarChart3 size={18} />
@@ -715,7 +794,7 @@ export default function App() {
           type="button"
           onClick={() => {
             setTrackerStatusFilter('ALL');
-            setActiveTab('tracker');
+            handleSelectNavTab('tracker');
           }}
           className={`${styles.bottomNavBtn} ${activeTab === 'tracker' ? styles.bottomNavBtnActive : ''}`}
         >
@@ -725,20 +804,20 @@ export default function App() {
 
         <button
           type="button"
-          onClick={() => setActiveTab('flowchart')}
-          className={`${styles.bottomNavBtn} ${activeTab === 'flowchart' ? styles.bottomNavBtnActive : ''}`}
+          onClick={() => handleSelectNavTab('waterlog')}
+          className={`${styles.bottomNavBtn} ${activeTab === 'waterlog' ? styles.bottomNavBtnActive : ''}`}
         >
-          <GitBranch size={18} />
-          <span>Flowchart</span>
+          <Droplets size={18} />
+          <span>Water Log</span>
         </button>
 
         <button
           type="button"
-          onClick={() => setTutorialOpen(true)}
-          className={styles.bottomNavBtn}
+          onClick={() => handleSelectNavTab('flowchart')}
+          className={`${styles.bottomNavBtn} ${activeTab === 'flowchart' ? styles.bottomNavBtnActive : ''}`}
         >
-          <HelpCircle size={18} className="text-cyan-400" />
-          <span>Guide</span>
+          <GitBranch size={18} />
+          <span>Flowchart</span>
         </button>
 
         <button

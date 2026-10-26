@@ -3,6 +3,7 @@ import {
   FlaskConical, Search, AlertTriangle, ShieldCheck, BookOpen, ExternalLink, RefreshCw, Activity
 } from 'lucide-react';
 import styles from '../styles/GlassSystem.module.css';
+import WaterQualityZoneLogger from './WaterQualityZoneLogger.jsx';
 
 const PRESET_COMPOUNDS = [
   {
@@ -166,6 +167,9 @@ export default function BioscienceLabView({ showToast }) {
           })}
         </div>
       </div>
+
+      {/* Drainage Zone Water Quality Data Entry Form & Simple List View */}
+      <WaterQualityZoneLogger showToast={showToast} />
 
       {/* Main Split Grid: Left = PubChem Molecular Inspector, Right = Europe PMC Biomedical Evidence */}
       <div className={styles.splitGrid}>

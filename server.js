@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +22,9 @@ import {
   ticketsToCsv,
   generateSampleRequestLetter,
   getManilaSpatialDrainageContext,
+  IDENTIFIED_DRAINAGE_ZONES,
+  validateWaterQualityEntry,
+  evaluateWaterDrainageSafety,
 } from './src/utils/workflowRules.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -188,6 +192,98 @@ export async function createApp() {
         .all(limit)
         .map(formatAuditRow);
       res.json({ auditLogs: rows, total: rows.length });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Water Quality Logs for Identified Drainage Zones (List, Log Entry, Delete)
+  app.get('/api/water-quality-logs', (req, res, next) => {
+    try {
+      const { zoneId = '', district = '', status = '' } = req.query;
+      let rows = db
+        .prepare('SELECT * FROM water_quality_logs ORDER BY recordedAt DESC')
+        .all();
+
+      if (zoneId && zoneId !== 'ALL') {
+        rows = rows.filter((r) => r.zoneId === zoneId);
+      }
+      if (district && district !== 'ALL') {
+        rows = rows.filter((r) => r.district === district);
+      }
+      if (status && status !== 'ALL') {
+        rows = rows.filter((r) => r.overallStatus === status);
+      }
+
+      const enriched = rows.map((row) => ({
+        ...row,
+        evaluation: evaluateWaterDrainageSafety(row),
+      }));
+
+      res.json({
+        logs: enriched,
+        zones: IDENTIFIED_DRAINAGE_ZONES,
+        total: enriched.length,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post('/api/water-quality-logs', (req, res, next) => {
+    try {
+      const validation = validateWaterQualityEntry(req.body || {});
+      if (!validation.isValid) {
+        return res.status(400).json({
+          error: validation.errors.join(' '),
+          details: validation.errors,
+        });
+      }
+
+      const { entry, evaluation } = validation;
+      db.prepare(`
+        INSERT INTO water_quality_logs (
+          logId, zoneId, zoneName, district, dissolvedOxygen, h2sPpm,
+          turbidityNtu, ammoniaMgL, flowIndex, pH, waterTempC,
+          overallStatus, inspectorName, notes, recordedAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        entry.logId,
+        entry.zoneId,
+        entry.zoneName,
+        entry.district,
+        entry.dissolvedOxygen,
+        entry.h2sPpm,
+        entry.turbidityNtu,
+        entry.ammoniaMgL,
+        entry.flowIndex,
+        entry.pH,
+        entry.waterTempC,
+        entry.overallStatus,
+        entry.inspectorName,
+        entry.notes,
+        entry.recordedAt
+      );
+
+      res.status(201).json({
+        log: {
+          ...entry,
+          evaluation,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.delete('/api/water-quality-logs/:logId', (req, res, next) => {
+    try {
+      const { logId } = req.params;
+      const result = db.prepare('DELETE FROM water_quality_logs WHERE logId = ?').run(logId);
+      if (result.changes === 0) {
+        return res.status(404).json({ error: 'Water quality log entry not found.' });
+      }
+      res.json({ deleted: true, logId });
     } catch (err) {
       next(err);
     }
@@ -1210,18 +1306,23 @@ async function startServer() {
     }
   });
 
-  if (process.env.NODE_ENV !== 'production') {
+  const distPath = path.join(__dirname, 'dist');
+  const distIndex = path.join(distPath, 'index.html');
+
+  if (process.env.NODE_ENV === 'production' && fs.existsSync(distIndex)) {
+    app.use(express.static(distPath));
+    app.use((req, res, next) => {
+      if (req.method === 'GET' && !req.path.startsWith('/api')) {
+        return res.sendFile(distIndex);
+      }
+      next();
+    });
+  } else {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(__dirname, 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
   }
 
   const PORT = Number(process.env.PORT) || 3000;

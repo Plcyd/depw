@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
+import { INITIAL_WATER_QUALITY_LOGS } from '../utils/workflowRules.js';
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 if (!fs.existsSync(DATA_DIR)) {
@@ -77,9 +78,28 @@ export function runMigrationsAndSeed() {
       notes TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS water_quality_logs (
+      logId TEXT PRIMARY KEY,
+      zoneId TEXT NOT NULL,
+      zoneName TEXT NOT NULL,
+      district TEXT NOT NULL,
+      dissolvedOxygen REAL NOT NULL,
+      h2sPpm REAL NOT NULL,
+      turbidityNtu REAL NOT NULL,
+      ammoniaMgL REAL NOT NULL,
+      flowIndex REAL NOT NULL,
+      pH REAL NOT NULL DEFAULT 7.2,
+      waterTempC REAL NOT NULL DEFAULT 28.5,
+      overallStatus TEXT NOT NULL,
+      inspectorName TEXT NOT NULL,
+      notes TEXT NOT NULL DEFAULT '',
+      recordedAt TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
     CREATE INDEX IF NOT EXISTS idx_tickets_district ON tickets(district);
     CREATE INDEX IF NOT EXISTS idx_history_ticket ON ticket_history(ticketId);
+    CREATE INDEX IF NOT EXISTS idx_wql_zone ON water_quality_logs(zoneId);
   `);
 
   // Safe schema evolution for ticket_history audit columns
@@ -107,7 +127,39 @@ export function runMigrationsAndSeed() {
     `);
     seedInitialData();
   }
+
+  // Seed initial water quality logs if empty
+  const wqlCountRow = db.prepare('SELECT COUNT(*) as count FROM water_quality_logs').get();
+  if (!wqlCountRow || wqlCountRow.count === 0) {
+    const insertWql = db.prepare(`
+      INSERT INTO water_quality_logs (
+        logId, zoneId, zoneName, district, dissolvedOxygen, h2sPpm,
+        turbidityNtu, ammoniaMgL, flowIndex, pH, waterTempC,
+        overallStatus, inspectorName, notes, recordedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const item of INITIAL_WATER_QUALITY_LOGS) {
+      insertWql.run(
+        item.logId,
+        item.zoneId,
+        item.zoneName,
+        item.district,
+        item.dissolvedOxygen,
+        item.h2sPpm,
+        item.turbidityNtu,
+        item.ammoniaMgL,
+        item.flowIndex,
+        item.pH,
+        item.waterTempC,
+        item.overallStatus,
+        item.inspectorName,
+        item.notes,
+        item.recordedAt
+      );
+    }
+  }
 }
+
 
 function seedInitialData() {
   const initialTickets = [

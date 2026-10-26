@@ -40,6 +40,7 @@ import styles from '../styles/GlassSystem.module.css';
 import { api } from '../services/api.js';
 import { MANILA_16_DISTRICTS, TICKET_STATUSES } from '../utils/workflowRules.js';
 import ThresholdAlertNotification from './ThresholdAlertNotification.jsx';
+import WaterQualityZoneLogger from './WaterQualityZoneLogger.jsx';
 
 const CHART_COLORS = ['#38bdf8', '#818cf8', '#34d399', '#fbbf24', '#f97316', '#f43f5e', '#a855f7', '#2dd4bf'];
 
@@ -51,6 +52,7 @@ export default function CommandCenterView({
   onOpenSmartTracker,
   onOpenJourneyReplay,
   onOpenTutorial,
+  onOpenTitaNerryGuide,
   onNavigateTab,
   showToast,
 }) {
@@ -164,10 +166,10 @@ export default function CommandCenterView({
       {/* Friendly Welcome & Quick Launch Hero */}
       {!welcomeBannerDismissed && (
         <div
-          className="relative overflow-hidden rounded-2xl p-5 md:p-6 border border-cyan-400/35 shadow-xl transition-all"
+          className={styles.glassPanel}
           style={{
-            background: 'linear-gradient(135deg, rgba(8, 25, 60, 0.92) 0%, rgba(12, 42, 92, 0.85) 50%, rgba(6, 18, 45, 0.95) 100%)',
-            backdropFilter: 'blur(16px)',
+            padding: '20px 24px',
+            border: '1px solid var(--glass-border)',
           }}
         >
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -176,32 +178,58 @@ export default function CommandCenterView({
                 <Sparkles size={24} className="text-white" />
               </div>
               <div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 mb-1.5">
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '3px 10px',
+                    borderRadius: '999px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    background: 'rgba(56, 189, 248, 0.16)',
+                    color: 'var(--accent-cyan)',
+                    border: '1px solid var(--glass-border)',
+                    marginBottom: '6px',
+                  }}
+                >
                   🇵🇭 MABUHAY! • MALIGAYANG PAGDATING SA MAYNILA DEPW ASSIST
                 </div>
                 <h2 className="text-xl md:text-2xl font-extrabold text-[var(--text-primary)] tracking-tight">
                   Mabilis, Malinaw, at Ligtas na Serbisyong Paglilinis ng Kanal
                 </h2>
                 <p className="text-sm text-[var(--text-secondary)] mt-1.5 leading-relaxed">
-                  Ang opisyal na public works command center ng Lungsod ng Maynila. Subaybayan ang mga kahilingan ng inyong barangay, tingnan ang catch basins sa mapa, at alamin ang ligtas na daloy ng tubig.
+                  Ang opisyal na public works command center ng Lungsod ng Maynila. May kasamang simpleng gabay para kay Tita Nerry, step-by-step tutorial, at 8-hakbang na flowchart!
                 </p>
               </div>
             </div>
 
             {/* Quick Actions & Dismiss */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {onOpenTitaNerryGuide && (
+                <button
+                  type="button"
+                  onClick={() => onOpenTitaNerryGuide()}
+                  className={styles.secondaryBtn}
+                  style={{ padding: '8px 14px', fontSize: '12px' }}
+                >
+                  <span>📄 Gabay ni Tita Nerry (.TXT)</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => onOpenTutorial && onOpenTutorial()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md shadow-cyan-500/25 transition cursor-pointer"
+                className={styles.primaryBtn}
+                style={{ padding: '8px 14px', fontSize: '12px' }}
               >
                 <HelpCircle size={15} />
-                <span>Magsimula sa Gabay (Tour)</span>
+                <span>Magsimula sa Gabay (Tutorial)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setWelcomeBannerDismissed(true)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+                className={styles.secondaryBtn}
+                style={{ padding: '8px' }}
                 title="Dismiss welcome message"
                 aria-label="Dismiss welcome message"
               >
@@ -211,17 +239,24 @@ export default function CommandCenterView({
           </div>
 
           {/* 4 Friendly Quick-Start Action Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-sky-400/20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-[var(--glass-border)]">
             <div
               onClick={() => onOpenSmartTracker ? onOpenSmartTracker() : onNavigateTab?.('tracker')}
-              className="p-3.5 rounded-xl bg-slate-900/75 hover:bg-slate-900 border border-sky-400/25 hover:border-cyan-400/60 transition cursor-pointer group"
+              style={{
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'var(--bg-navy-elevated)',
+                border: '1px solid var(--glass-border)',
+                cursor: 'pointer',
+              }}
+              className="hover:scale-[1.01] transition group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-sky-500/20 flex items-center justify-center text-cyan-300 group-hover:scale-105 transition">
+                <div className="w-9 h-9 rounded-xl bg-sky-500/20 flex items-center justify-center text-[var(--accent-cyan)] group-hover:scale-105 transition">
                   <Table2 size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-cyan-300 transition">
+                  <div className="text-xs font-bold text-[var(--text-primary)]">
                     1. Smart Tracker
                   </div>
                   <div className="text-[11px] text-[var(--text-muted)]">
@@ -232,16 +267,49 @@ export default function CommandCenterView({
             </div>
 
             <div
-              onClick={() => onNavigateTab?.('map')}
-              className="p-3.5 rounded-xl bg-slate-900/75 hover:bg-slate-900 border border-emerald-400/25 hover:border-emerald-400/60 transition cursor-pointer group"
+              onClick={() => onNavigateTab?.('flowchart')}
+              style={{
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'var(--bg-navy-elevated)',
+                border: '1px solid var(--glass-border)',
+                cursor: 'pointer',
+              }}
+              className="hover:scale-[1.01] transition group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-300 group-hover:scale-105 transition">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition">
+                  <GitBranch size={18} />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-[var(--text-primary)]">
+                    2. 8-Step Flowchart
+                  </div>
+                  <div className="text-[11px] text-[var(--text-muted)]">
+                    Proseso mula liham hanggang linis
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              onClick={() => onNavigateTab?.('map')}
+              style={{
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'var(--bg-navy-elevated)',
+                border: '1px solid var(--glass-border)',
+                cursor: 'pointer',
+              }}
+              className="hover:scale-[1.01] transition group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-emerald-300 transition">
-                    2. Street Map GIS
+                  <div className="text-xs font-bold text-[var(--text-primary)]">
+                    3. Street Map GIS
                   </div>
                   <div className="text-[11px] text-[var(--text-muted)]">
                     Tingnan ang catch basins sa mapa
@@ -251,38 +319,26 @@ export default function CommandCenterView({
             </div>
 
             <div
-              onClick={() => onOpenJourneyReplay?.(tickets[0]?.ticketId || 'DEO-2026-001')}
-              className="p-3.5 rounded-xl bg-slate-900/75 hover:bg-slate-900 border border-amber-400/25 hover:border-amber-400/60 transition cursor-pointer group"
+              onClick={() => onOpenTitaNerryGuide ? onOpenTitaNerryGuide() : onOpenTutorial?.()}
+              style={{
+                padding: '14px',
+                borderRadius: '12px',
+                background: 'var(--bg-navy-elevated)',
+                border: '1px solid var(--glass-border)',
+                cursor: 'pointer',
+              }}
+              className="hover:scale-[1.01] transition group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-300 group-hover:scale-105 transition">
-                  <RotateCcw size={18} />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-105 transition">
+                  <HelpCircle size={18} />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-amber-300 transition">
-                    3. Journey Replay
+                  <div className="text-xs font-bold text-[var(--text-primary)]">
+                    4. Gabay ni Tita Nerry
                   </div>
                   <div className="text-[11px] text-[var(--text-muted)]">
-                    Panoorin ang takbo ng request
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              onClick={() => onNavigateTab?.('flowchart')}
-              className="p-3.5 rounded-xl bg-slate-900/75 hover:bg-slate-900 border border-purple-400/25 hover:border-purple-400/60 transition cursor-pointer group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-300 group-hover:scale-105 transition">
-                  <GitBranch size={18} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-purple-300 transition">
-                    4. 8-Hakbang Flow
-                  </div>
-                  <div className="text-[11px] text-[var(--text-muted)]">
-                    Proseso mula liham hanggang linis
+                    Simple .TXT manual at Tutorial
                   </div>
                 </div>
               </div>
@@ -451,6 +507,9 @@ export default function CommandCenterView({
         }}
         onNavigateToLab={() => onNavigateTab && onNavigateTab('bioscience')}
       />
+
+      {/* Drainage Zone Water Quality Data Entry Form, Simple List View & Zone Visualizer */}
+      <WaterQualityZoneLogger showToast={showToast} compactHeader={true} />
 
       {/* Primary Charts Grid: Resolution Time Averages & Water Quality Trends */}
       <div className={styles.splitGrid}>
