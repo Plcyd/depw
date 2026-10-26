@@ -279,12 +279,12 @@ export default function TutorialManager({
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <img
-                src="/assets/aistudio/image_5aec6efb.png"
+                src="./assets/aistudio/image_5aec6efb.png"
                 alt="Manila Seal"
                 style={{ width: '32px', height: '32px', objectFit: 'contain' }}
               />
               <img
-                src="/assets/aistudio/image_81ca72a0.png"
+                src="./assets/aistudio/image_81ca72a0.png"
                 alt="DEPW Seal"
                 style={{ width: '32px', height: '32px', objectFit: 'contain' }}
               />

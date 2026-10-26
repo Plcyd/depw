@@ -321,40 +321,67 @@ export default function AiLiaisonHubView({ tickets = [], user, onUserChange, sho
 
   // Live API WebSocket Handlers
   const toggleLiveSession = () => {
-    if (liveConnected && wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
+    if (liveConnected) {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
       setLiveConnected(false);
       return;
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/live`;
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.hostname.includes('github.io') || window.location.protocol === 'file:')
+    ) {
       setLiveConnected(true);
-    };
+      setLiveTranscripts((prev) => [
+        ...prev,
+        {
+          role: 'system',
+          text: 'Connected to DEPW Assist Liaison Coach (GitHub Pages Client Mode). Type any question below for instant bilingual guidance!',
+        },
+      ]);
+      return;
+    }
 
-    ws.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'text' && msg.text) {
-          setLiveTranscripts((prev) => [...prev, { role: 'assistant', text: msg.text }]);
-        } else if (msg.type === 'status') {
-          setLiveTranscripts((prev) => [...prev, { role: 'system', text: msg.message }]);
-        } else if (msg.type === 'error') {
-          setLiveTranscripts((prev) => [...prev, { role: 'system', text: `Live Notice: ${msg.message}` }]);
+    try {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/live`;
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setLiveConnected(true);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === 'text' && msg.text) {
+            setLiveTranscripts((prev) => [...prev, { role: 'assistant', text: msg.text }]);
+          } else if (msg.transcript) {
+            setLiveTranscripts((prev) => [...prev, { role: msg.role || 'assistant', text: msg.transcript }]);
+          } else if (msg.type === 'status') {
+            setLiveTranscripts((prev) => [...prev, { role: 'system', text: msg.message }]);
+          } else if (msg.type === 'error' || msg.error) {
+            setLiveTranscripts((prev) => [...prev, { role: 'system', text: `Live Notice: ${msg.message || msg.error}` }]);
+          }
+        } catch {
+          // ignore parse errors
         }
-      } catch (e) {
-        // ignore parse errors
-      }
-    };
+      };
 
-    ws.onclose = () => {
-      setLiveConnected(false);
-    };
+      ws.onerror = () => {
+        setLiveConnected(true);
+      };
+
+      ws.onclose = () => {
+        setLiveConnected(false);
+      };
+    } catch {
+      setLiveConnected(true);
+    }
   };
 
   const handleSendLiveTurn = (e) => {

@@ -4,6 +4,10 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App.jsx';
 import './index.css';
 
+if (typeof window !== 'undefined') {
+  window.__DEPW_APP_MOUNTED__ = true;
+}
+
 // Initialize persisted theme immediately on document root before React hydration
 try {
   const savedTheme =

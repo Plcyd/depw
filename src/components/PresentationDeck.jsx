@@ -193,7 +193,7 @@ Subject: Request for Drainage Declogging at R. Magsaysay Street
       <div className={`${styles.glassPanel} flex flex-wrap items-center justify-between gap-4 py-3 px-5`}>
         <div className="flex items-center gap-3">
           <img
-            src="/assets/aistudio/image_81ca72a0.png"
+            src="./assets/aistudio/image_81ca72a0.png"
             alt="Department of Engineering and Public Works Manila Seal"
             referrerPolicy="no-referrer"
             className="w-9 h-9 rounded-full object-contain bg-white/90 p-0.5"
@@ -307,13 +307,13 @@ Subject: Request for Drainage Declogging at R. Magsaysay Street
             <div className="lg:col-span-7 space-y-5">
               <div className="flex items-center gap-3">
                 <img
-                  src="/assets/aistudio/image_5aec6efb.png"
+                  src="./assets/aistudio/image_5aec6efb.png"
                   alt="Official Seal of Lungsod ng Maynila"
                   referrerPolicy="no-referrer"
                   className="w-14 h-14 rounded-full bg-white p-1 object-contain shadow-md"
                 />
                 <img
-                  src="/assets/aistudio/image_81ca72a0.png"
+                  src="./assets/aistudio/image_81ca72a0.png"
                   alt="Department of Engineering and Public Works Manila Seal"
                   referrerPolicy="no-referrer"
                   className="w-14 h-14 rounded-full bg-white p-1 object-contain shadow-md"
@@ -639,7 +639,7 @@ Subject: Request for Drainage Declogging at R. Magsaysay Street
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-300 pb-4 mb-5">
                 <div className="flex items-center gap-3">
                   <img
-                    src="/assets/aistudio/image_5aec6efb.png"
+                    src="./assets/aistudio/image_5aec6efb.png"
                     alt="Lungsod ng Maynila Seal"
                     referrerPolicy="no-referrer"
                     className="w-12 h-12 object-contain"
@@ -1044,7 +1044,7 @@ Subject: Request for Drainage Declogging at R. Magsaysay Street
             {/* Philippine Transparency Seal Symbolism Section using Uploaded Asset */}
             <div className="p-4 rounded-xl bg-slate-900/75 border border-sky-400/20 flex flex-col sm:flex-row items-center gap-4">
               <img
-                src="/assets/aistudio/image_79da53c5.png"
+                src="./assets/aistudio/image_79da53c5.png"
                 alt="Philippine Transparency Seal"
                 referrerPolicy="no-referrer"
                 className="w-16 h-16 object-contain shrink-0 bg-white/95 rounded-full p-1"

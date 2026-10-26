@@ -17,8 +17,8 @@
     <div id="root">
       <div style="min-height: 100vh; background: #060d1f; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #f8fafc; padding: 24px; text-align: center;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-          <img src="/assets/aistudio/image_5aec6efb.png" alt="City of Manila Seal" style="width: 54px; height: 54px; object-fit: contain;" />
-          <img src="/assets/aistudio/image_81ca72a0.png" alt="DEPW Seal" style="width: 54px; height: 54px; object-fit: contain;" />
+          <img src="./assets/aistudio/image_5aec6efb.png" alt="City of Manila Seal" style="width: 54px; height: 54px; object-fit: contain;" />
+          <img src="./assets/aistudio/image_81ca72a0.png" alt="DEPW Seal" style="width: 54px; height: 54px; object-fit: contain;" />
         </div>
         <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #38bdf8; margin-bottom: 6px;">
           LUNGSOD NG MAYNILA • DEPW
@@ -36,7 +36,39 @@
         </div>
       </div>
     </div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Automatic asset & bundle recovery when GitHub Pages serves raw repository root instead of dist/
+      window.addEventListener(
+        'error',
+        function (e) {
+          var t = e && e.target;
+          if (t && t.tagName === 'IMG' && t.src && t.src.indexOf('/assets/aistudio/') !== -1 && !t.dataset.ghRetried) {
+            t.dataset.ghRetried = '1';
+            var file = t.src.split('/assets/aistudio/')[1];
+            t.src = './public/assets/aistudio/' + file;
+          }
+        },
+        true
+      );
+      window.__bootGhPagesStaticBundle = function () {
+        if (window.__DEPW_APP_MOUNTED__ || window.__DEPW_BOOTING_FALLBACK__) return;
+        window.__DEPW_BOOTING_FALLBACK__ = true;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = './public/gh-pages-dist/app.css';
+        document.head.appendChild(link);
+        var script = document.createElement('script');
+        script.type = 'module';
+        script.src = './public/gh-pages-dist/app.js';
+        document.body.appendChild(script);
+      };
+      setTimeout(function () {
+        if (!window.__DEPW_APP_MOUNTED__ && window.location.hostname.indexOf('github.io') !== -1) {
+          window.__bootGhPagesStaticBundle();
+        }
+      }, 1800);
+    </script>
+    <script type="module" src="/src/main.jsx" onerror="window.__bootGhPagesStaticBundle && window.__bootGhPagesStaticBundle()"></script>
   </body>
 </html>
 

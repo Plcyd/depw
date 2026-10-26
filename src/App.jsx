@@ -356,17 +356,17 @@ export default function App({ initialRouteTab = 'command' }) {
         <div className={styles.brandCluster}>
           <div className={styles.sealGroup}>
             <img
-              src="/assets/aistudio/image_5aec6efb.png"
+              src="./assets/aistudio/image_5aec6efb.png"
               alt="City of Manila Official Seal"
               className={styles.headerSealImg}
             />
             <img
-              src="/assets/aistudio/image_81ca72a0.png"
+              src="./assets/aistudio/image_81ca72a0.png"
               alt="Department of Engineering and Public Works Seal"
               className={styles.headerSealImg}
             />
             <img
-              src="/assets/aistudio/image_79da53c5.png"
+              src="./assets/aistudio/image_79da53c5.png"
               alt="Philippine Transparency Seal"
               className={styles.headerSealImg}
             />

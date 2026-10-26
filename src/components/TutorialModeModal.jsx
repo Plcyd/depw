@@ -279,7 +279,7 @@ export default function TutorialModeModal({
         {/* City of Manila Official Skyline Architectural Banner Strip */}
         <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
           <img
-            src="/assets/aistudio/image_f915b5a7.png"
+            src="./assets/aistudio/image_f915b5a7.png"
             alt="City of Manila Skyline & Official Republic of the Philippines Header"
             className={styles.skylineBannerImg}
           />
@@ -302,12 +302,12 @@ export default function TutorialModeModal({
             {/* Manila City & DEPW Seals */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <img
-                src="/assets/aistudio/image_5aec6efb.png"
+                src="./assets/aistudio/image_5aec6efb.png"
                 alt="Manila Seal"
                 style={{ width: '28px', height: '28px', objectFit: 'contain' }}
               />
               <img
-                src="/assets/aistudio/image_81ca72a0.png"
+                src="./assets/aistudio/image_81ca72a0.png"
                 alt="DEPW Seal"
                 style={{ width: '28px', height: '28px', objectFit: 'contain' }}
               />

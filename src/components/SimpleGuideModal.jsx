@@ -398,7 +398,7 @@ export default function SimpleGuideModal({
                 📄 Nilalaman ng File: /HOW_TO_USE_FOR_TITA_NERRY.txt
               </span>
               <a
-                href="/HOW_TO_USE_FOR_TITA_NERRY.txt"
+                href="./HOW_TO_USE_FOR_TITA_NERRY.txt"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
