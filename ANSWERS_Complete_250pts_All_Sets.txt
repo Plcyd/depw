@@ -1,0 +1,294 @@
+================================================================================
+COURSE: IMPLEMENT BASIC AUTOMATION TECHNIQUES USING AI TOOLS
+PROJECT: AUTOMATED PROBLEM-SOLVER PROJECT — DESIGN YOUR CUSTOM WORKFLOW
+STRUCTURE: 4 SETS | 11 ITEMS | 250 TOTAL POINTS
+================================================================================
+NOTE ON TEAM SIZE:
+- Teams of 1 to 4 members: Submit WORKFLOW 1 (Barangay Declogging & GIS Smart Tracker).
+- Teams of 5+ members: Submit BOTH WORKFLOW 1 AND WORKFLOW 2 (Drainage Water Quality & H2S Safety Telemetry).
+
+================================================================================
+SET 1 OF 4: DEFINE YOUR PROBLEM (30 POINTS TOTAL)
+================================================================================
+
+--------------------------------------------------------------------------------
+SET 1 — QUESTION 1 (10 Points)
+Prompt: What is the specific, real-world problem your workflow solves? *
+--------------------------------------------------------------------------------
+
+[WORKFLOW 1 ANSWER — Barangay Declogging & GIS Smart Tracker]:
+Municipal public works engineering offices (such as Manila DEPW) and barangay dispatchers face severe daily bottlenecks processing unstructured drainage declogging, manhole rehabilitation, and street flood reports sent across scattered Facebook pages, Viber groups, emails, and walk-in desks. Clerks spend 10 to 15 minutes per report manually reading vague messages, cross-checking street names against maps to figure out which of the 6 engineering districts has jurisdiction, checking spreadsheets for duplicate complaints, and typing job orders. During heavy rains, this manual process causes a 24-to-48-hour backlog, dispatches Vacuum Jetter trucks to duplicate or wrong locations, and risks exposing citizen personal data (phone numbers and IDs) in public chat threads.
+
+[WORKFLOW 2 ANSWER — For Teams > 4 Members: Drainage Water Quality & H2S Safety]:
+Engineering field crews entering underground drainage laterals and box culverts face hidden, life-threatening hazards from toxic Hydrogen Sulfide (H2S) gas pockets, low dissolved oxygen, and illegal chemical waste dumping. Manually logging paper water-quality checklists and calling supervisors for safety clearance delays emergency declogging operations by 30 to 45 minutes per site and leaves crews vulnerable to sudden toxic gas spikes without automated evacuation triggers or PPE compliance enforcement.
+
+
+--------------------------------------------------------------------------------
+SET 1 — QUESTION 2 (10 Points)
+Prompt: Who is the main person or group that benefits from this workflow? *
+--------------------------------------------------------------------------------
+
+[WORKFLOW 1 ANSWER]:
+1. Primary Beneficiaries: Municipal Public Works Dispatchers, District Engineers, and Field Declogging Crews—who eliminate repetitive manual data entry, avoid wasted fuel on duplicate or misrouted trips, and receive pre-triaged, GPS-pinned work orders with exact equipment recommendations.
+2. Secondary Beneficiaries: Barangay Officials and Local Citizens/Residents—who receive instant 24/7 ticket confirmation, privacy-protected reporting, and faster flood-mitigation response times in their neighborhoods.
+
+[WORKFLOW 2 ANSWER — For Teams > 4 Members]:
+1. Primary Beneficiaries: Underground Drainage Maintenance Workers, Confined-Space Entry Crews, and Municipal Safety Officers—who receive real-time automated go/no-go safety clearances, mandatory respiratory PPE alerts, and instant hazard lockdowns before entering dangerous manholes.
+2. Secondary Beneficiaries: Environmental Compliance Inspectors and nearby Barangay Communities—who are protected from toxic sewer gas leaks and illegal industrial discharge.
+
+
+--------------------------------------------------------------------------------
+SET 1 — QUESTION 3 (10 Points)
+Prompt: Why is solving this problem important? What is the impact (time saved, reduced errors, better service, etc.)? *
+--------------------------------------------------------------------------------
+
+[WORKFLOW 1 ANSWER]:
+1. Massive Time Savings: Cuts per-ticket intake, district verification, and dispatch triage time from 14 minutes down to 45 seconds (a 95% reduction, saving 16.25 staff-hours every week at 75 tickets/week).
+2. Reduced Routing & Dispatch Errors: Automated GIS point-in-polygon district boundary checks and 100-meter radius deduplication eliminate misrouted crews and duplicate truck dispatches.
+3. Faster Flood Prevention & Public Service: Urgent main-thoroughfare blockages and school/hospital flood hazards are prioritized automatically within seconds, preventing severe urban flooding and property damage.
+4. Strict Data Privacy Compliance: Automated regex masking strips accidental government IDs or financial data before storage and enforces explicit user consent.
+
+[WORKFLOW 2 ANSWER — For Teams > 4 Members]:
+1. Zero Confined-Space Fatalities & Injuries: Automatically blocks crew entry within 3 seconds when H2S exceeds 10 ppm or pH falls outside 6.0–8.5, preventing toxic gas inhalation.
+2. Faster Safety Clearance: Reduces pre-entry environmental review and PPE verification from 35 minutes of manual phone calls to under 15 seconds.
+3. Audit-Ready Compliance: Creates tamper-proof safety telemetry logs for every drainage operation.
+
+
+================================================================================
+SET 2 OF 4: BUILD YOUR WORKFLOW (100 POINTS TOTAL)
+================================================================================
+
+--------------------------------------------------------------------------------
+SET 2 — QUESTION 1 (50 Points)
+Prompt: Upload your Flowchart here *
+(See also: FLOWCHART_Automated_Workflow.svg and FLOWCHART_Automated_Workflow.txt)
+--------------------------------------------------------------------------------
+
+[VISUAL & TEXT FLOWCHART — WORKFLOW 1: BARANGAY DECLOGGING & GIS SMART TRACKER]
+
+  ( START TRIGGER )
+  Citizen / Barangay Official submits flood or clogged drainage report
+  with photo, street/barangay, and GPS pin via Web Form / Messenger Webhook
+         |
+         v
+  [ STEP 1: DATA PRIVACY & PII GUARDRAIL ]
+  Verify explicit consent checkbox & run Regex sanitizer to mask any
+  accidental sensitive PII (Gov IDs, TIN, bank numbers) -> Replace with [REDACTED]
+         |
+         v
+  < DECISION GATE 1: COMPLETE & UNIQUE? >
+  Does report have valid coordinates/address AND no active ticket
+  within 100m in the last 48 hours?
+     |                                    |
+     |-- [NO: Incomplete] --------------> [ Auto-Reply: Request missing street/pin ] -> (END)
+     |-- [NO: Duplicate <100m / 48h] ---> [ Merge as Upvote on Master Ticket & Notify ] -> (END)
+     |
+     v [YES: Valid & Unique]
+  [ STEP 2: AUTOMATED GIS SPATIAL ROUTING ]
+  Run Point-in-Polygon coordinate lookup against Manila District I-VI boundaries
+  -> Assign Engineering District + Tag nearest flood-prone elevation zone
+         |
+         v
+  [ STEP 3: AI MULTIMODAL TRIAGE & SCORING (GEMINI 2.5 FLASH) ]
+  Analyze site photo + text description -> Output structured JSON:
+  - Obstruction Type (Heavy Silt, Solid Waste, Collapsed Culvert, Grease)
+  - Urgency Score (0-100) & Priority Tier (Critical / High / Medium / Low)
+  - Recommended Equipment (Vacuum Jetter, Declogging Rod, Clamshell, Manual Crew)
+         |
+         v
+  < DECISION GATE 2: CRITICAL SCORE >= 80 OR SAFETY HAZARD? >
+     |                                    |
+     |-- [YES: Critical >= 80] ---------> [ Immediate SMS/Webhook Alert to District Engineer ]
+     |                                    [ + Lock Confined-Space Entry until Gas Check ]
+     |-- [NO: Standard < 80] -----------> [ Queue in District Daily Route Optimization Batch ]
+     |                                    |
+     +-----------------+------------------+
+                       |
+                       v
+  [ STEP 4: AUTOMATED TICKET LOGGING & CITIZEN CONFIRMATION ]
+  Append structured row to Central Dispatch Database / Google Sheet
+  + Send Tracking ID & ETA notification to Citizen / Barangay Captain
+         |
+         v
+  ( END GOAL )
+  Crew dispatched with exact GPS pin & right equipment in < 45 seconds!
+
+
+[VISUAL & TEXT FLOWCHART — WORKFLOW 2 (Teams > 4): WATER QUALITY & H2S SAFETY]
+
+  ( START TRIGGER )
+  Pre-entry portable sensor reading or field crew safety check submitted at manhole site
+         |
+         v
+  [ STEP 1: TELEMETRY INGESTION & VALIDATION ]
+  Parse H2S (ppm), Dissolved O2 (%), pH, Turbidity (NTU), and GPS site ID
+         |
+         v
+  [ STEP 2: AI HAZARD CORRELATION & ANOMALY DETECTION ]
+  Compare sensor spike against historical culvert baseline & nearby industrial outfalls
+         |
+         v
+  < DECISION GATE: H2S >= 10 ppm OR O2 < 19.5% OR pH OUTSIDE 6.0-8.5? >
+     |                                    |
+     |-- [YES: HAZARD DETECTED] --------> [ RED ALERT: Auto-Lock Work Order ]
+     |                                    [ Require SCBA + Forced Ventilation + Notify Safety Officer ]
+     |-- [NO: SAFE LEVELS] -------------> [ GREEN CLEARANCE: Issue Digital Confined-Space Permit ]
+                                          [ Log Compliance Timestamp & Authorize Crew Entry ]
+                                                 |
+                                                 v
+                                            ( END GOAL )
+
+
+--------------------------------------------------------------------------------
+SET 2 — QUESTION 2 (50 Points)
+Prompt: Upload your Workflow here * (Complete Step-by-Step Technical Specification)
+--------------------------------------------------------------------------------
+
+[WORKFLOW 1 SPECIFICATION — BARANGAY DECLOGGING & GIS SMART TRACKER]:
+1. Trigger Event: HTTP Webhook / Web Portal submission containing Citizen Name, Contact Number, Explicit Consent Boolean, Barangay No., Street Address, GPS Latitude/Longitude, Text Description, and Site Photo URL.
+2. Node 1 — Consent & Privacy Sanitizer (Rule-Based Script):
+   - Verifies `consentAccepted === true`.
+   - Applies regex filters to description text to strip 12-digit IDs, credit cards, or passwords before logging.
+3. Node 2 — Spatial Deduplication & GIS District Assignment (GeoJSON Engine):
+   - Calculates Haversine distance against active tickets from the last 48 hours. If distance <= 100m, increments `upvoteCount` on existing Ticket ID and sends duplicate-merge receipt.
+   - Runs point-in-polygon check against Manila Districts I–VI GeoJSON boundaries to auto-populate `assignedDistrict`.
+4. Node 3 — AI Multimodal Classification & Triage (Gemini 2.5 Flash API):
+   - System Prompt: "Act as a Municipal Drainage Triage Engineer. Analyze the citizen report and image. Return strict JSON with keys: `obstructionCategory`, `severityScore` (0-100), `priorityLevel` (Critical/High/Medium/Low), `recommendedEquipment`, `estimatedCrewSize`, and `triageSummary`."
+5. Node 4 — Conditional Dispatch Router:
+   - IF `severityScore >= 80` OR near hospital/school: Trigger instant Priority Webhook to District Duty Engineer + reserve Vacuum Jetter Unit.
+   - ELSE: Assign to next scheduled barangay declogging cluster route.
+6. Node 5 — Database Persistence & Citizen Notification:
+   - Writes structured record to Central Dispatch Tracker and dispatches SMS/Web confirmation with Ticket Reference ID.
+
+[WORKFLOW 2 SPECIFICATION — DRAINAGE WATER QUALITY & H2S SAFETY TELEMETRY]:
+1. Trigger Event: Field crew submits pre-entry multi-gas & water quality probe telemetry via mobile form or IoT webhook.
+2. Node 1 — Threshold Rule Engine: Evaluates OSHA/NIOSH confined-space limits (`H2S < 10 ppm`, `O2 >= 19.5%`, `6.0 <= pH <= 8.5`).
+3. Node 2 — AI Environmental Anomaly Analyzer: Evaluates multi-parameter trends (e.g., sudden pH drop + high turbidity indicating illegal chemical dumping upstream) and generates specific PPE & ventilation instructions.
+4. Node 3 — Automated Permit Gatekeeper: Issues digital entry clearance or locks ticket status to `HOLD_HAZARD_VENTILATION_REQUIRED` and alerts the Safety Officer.
+
+
+================================================================================
+SET 3 OF 4: FINAL REVIEW (70 POINTS TOTAL)
+================================================================================
+
+--------------------------------------------------------------------------------
+SET 3 — QUESTION 1 (35 Points)
+Prompt: How does your workflow use AI to improve the process? (Explain what makes it smarter than a simple rule-based automation.) *
+--------------------------------------------------------------------------------
+
+[COMPLETE ANSWER]:
+A simple rule-based automation (such as basic IF/THEN keyword filters or standard form-to-sheet scripts) fails in real-world municipal reporting because citizens write in unstructured English, Tagalog, or Taglish, use inconsistent street descriptions, and upload photos without technical labels. For example, a rule looking for the word "flood" might miss a critical report that says "Tubig hanggang tuhod sa tapat ng health center, barado ng sako-sakong basura ang imburnal" ("Knee-deep water in front of the health center, drainage blocked by sacks of garbage") or over-prioritize a minor puddle just because the user typed "URGENT!!!" in all caps.
+
+Our workflow uses Multimodal AI (Gemini 2.5 Flash) to make the system genuinely intelligent in four ways:
+1. Visual Severity & Obstruction Recognition: Instead of relying on user checkboxes, the AI inspects the uploaded site photo to distinguish between surface litter (solvable by a 2-person manual crew with declogging rods) and compacted silt, grease buildup, or a collapsed concrete box culvert (which requires dispatching a heavy Vacuum Jetter truck or Clamshell excavator).
+2. Multilingual & Contextual Understanding: The AI naturally understands English, Tagalog, and Taglish descriptions, extracting the exact landmark, water depth, and public risk (such as proximity to schools, hospitals, or main arteries) even from informal messages.
+3. Multi-Factor Dynamic Priority Scoring (0–100): Rather than a rigid FIFO queue, the AI synthesizes visual evidence, text context, weather conditions, and GIS flood-zone elevation to generate an objective 0–100 Urgency Score and a 1-sentence engineering briefing for the crew.
+4. Intelligent Hazard & Anomaly Synthesis (Workflow 2): In our companion Water Quality & H2S Safety workflow, AI correlates subtle multi-sensor patterns (such as gradual H2S rise combined with abnormal pH and turbidity) to identify upstream illegal chemical dumping vs. normal organic sewer gas—predicting toxic spikes before they breach static alarm thresholds.
+
+
+--------------------------------------------------------------------------------
+SET 3 — QUESTION 2 (35 Points)
+Prompt: Estimate how much time or effort your workflow could save per week. Show your calculation or reasoning. *
+--------------------------------------------------------------------------------
+
+[COMPLETE ANSWER WITH STEP-BY-STEP CALCULATION]:
+
+Headline Estimate:
+Our automated workflow saves 975 minutes (16.25 hours) of manual staff effort per week for a single municipal engineering dispatch desk handling an average of 75 declogging/flood reports per week—representing a 94.6% reduction in processing time (over 2 full 8-hour workdays saved every week).
+
+1. Baseline Manual Process (Before Automation) = 14.0 Minutes per Report:
+   - Reading unstructured message, checking photo, and replying for missing info: 3.0 mins
+   - Looking up street/barangay on a map to verify District I–VI boundary: 3.5 mins
+   - Searching existing spreadsheet logs to check for duplicate reports: 2.5 mins
+   - Assessing severity, deciding equipment needed, and typing row into tracker: 3.0 mins
+   - Sending confirmation message & forwarding work order to District Engineer: 2.0 mins
+   -> Total Manual Time per Report = 14.0 minutes
+   -> Weekly Manual Effort (75 reports/week x 14.0 mins) = 1,050 minutes (17.5 hours/week)
+
+2. Automated AI + GIS Workflow (After Automation) = 1.0 Minute per Report:
+   - Intake, PII privacy masking, GIS District lookup, 100m duplicate check, AI photo/text triage, and sheet logging run automatically in 5 to 10 seconds (0 mins of human typing).
+   - Human-in-the-loop dispatcher simply reviews the pre-filled AI recommendation card and clicks "Approve Dispatch": 1.0 minute per report.
+   -> Total Human Time per Report = 1.0 minute
+   -> Weekly Human Effort (75 reports/week x 1.0 min) = 75 minutes (1.25 hours/week)
+
+3. Net Weekly Time & Effort Saved Calculation:
+   - Time Saved per Report = 14.0 mins - 1.0 min = 13.0 minutes saved per report
+   - Weekly Time Saved (Normal Week: 75 reports) = 75 x 13.0 mins = 975 minutes = 16.25 hours/week saved
+   - Typhoon / Monsoon Surge Week (200 reports/week) = 200 x 13.0 mins = 2,600 minutes = 43.3 hours/week saved
+   - Bonus Field Effort Saved (Workflow 2 Safety Check, for 5+ member teams): Automating 30 pre-entry H2S/water quality clearances per week saves an additional 15 mins per site = 450 minutes (7.5 hours/week) of field supervisor coordination.
+
+
+================================================================================
+SET 4 OF 4: PREPARE FOR PRESENTATION (50 POINTS TOTAL)
+================================================================================
+
+--------------------------------------------------------------------------------
+SET 4 — SLIDE DECK & SPEAKER NOTES (8 Slides | 50 Points)
+(Note: You can also download the animated PowerPoint .ppt / HTML5 Deck directly from the app!)
+--------------------------------------------------------------------------------
+
+SLIDE 1: TITLE & TEAM OVERVIEW
+- Slide Bullets:
+  * Automated Problem-Solver Project: AI-Powered Barangay Declogging & GIS Smart Tracker
+  * Companion Module (for 5+ Member Teams): Drainage Water Quality & H2S Safety Telemetry
+  * Built for Municipal Public Works (DEPW) & Barangay Flood Mitigation
+- Speaker Notes:
+  "Good day everyone! Today we are presenting our Automated Problem-Solver workflow designed to transform how municipal engineering offices and barangays handle drainage declogging and urban flood reports."
+
+SLIDE 2: THE REAL-WORLD PROBLEM (SET 1)
+- Slide Bullets:
+  * 75 to 200+ unstructured flood & clogged-drainage complaints arrive weekly via social media, Viber, and walk-ins.
+  * Dispatchers spend 14 minutes per ticket manually mapping districts, hunting for duplicates, and guessing equipment needs.
+  * Result: 24–48 hour backlogs during storms, wasted truck trips on duplicate reports, and privacy risks in public chats.
+- Speaker Notes:
+  "Every rainy season, dispatchers are overwhelmed by scattered messages. Manually verifying which of the 6 districts owns a street and checking spreadsheets for duplicates takes 14 minutes per report—delaying urgent flood response when minutes matter."
+
+SLIDE 3: WHO BENEFITS & WHY IT MATTERS (SET 1)
+- Slide Bullets:
+  * Primary Beneficiaries: DEPW Dispatchers, District Engineers, and Field Declogging Crews.
+  * Community Beneficiaries: 897 Barangays & local residents receiving instant tracking and faster flood relief.
+  * Core Impact: 95% faster triage, zero duplicate dispatches, strict PII privacy masking, and safer crew operations.
+- Speaker Notes:
+  "Our workflow directly empowers dispatchers and field engineers by eliminating manual data entry and misrouted trips, while giving citizens instant confirmation and faster flood protection."
+
+SLIDE 4: END-TO-END WORKFLOW ARCHITECTURE & FLOWCHART (SET 2)
+- Slide Bullets:
+  * Step 1 (Trigger & Privacy Gate): Citizen web/webhook intake -> Explicit Consent + Regex PII Redaction.
+  * Step 2 (Decision Gate 1 — GIS & Deduplication): Auto-detects District I–VI via GPS polygon; merges duplicates within 100m/48h.
+  * Step 3 (AI Multimodal Engine): Gemini 2.5 Flash analyzes photo + text -> Scores urgency (0–100) & selects equipment.
+  * Step 4 (Decision Gate 2 — Smart Dispatch): Critical (>=80) triggers instant Vacuum Jetter alert; standard queues in daily batch.
+- Speaker Notes:
+  "Here is our complete flowchart. Notice how rule-based guardrails handle privacy and 100-meter spatial deduplication first, before passing validated tickets to our AI triage engine and conditional dispatch router."
+
+SLIDE 5: COMPANION WORKFLOW 2 — WATER QUALITY & H2S SAFETY (SET 2 — TEAMS > 4)
+- Slide Bullets:
+  * Solves underground confined-space hazards (Hydrogen Sulfide gas spikes, low oxygen, illegal chemical dumping).
+  * Ingests portable sensor telemetry (H2S ppm, O2 %, pH, Turbidity) prior to manhole entry.
+  * Decision Gate: If H2S >= 10 ppm or O2 < 19.5%, auto-locks work order and mandates SCBA + ventilation.
+- Speaker Notes:
+  "For extended team scope, our second workflow protects field crews on site. Before anyone enters a culvert, sensor readings are automatically evaluated against OSHA safety limits and AI anomaly detection."
+
+SLIDE 6: HOW AI MAKES IT SMARTER THAN RULES (SET 3 Q1)
+- Slide Bullets:
+  * Keyword rules fail on Taglish slang, unlabelled site photos, and all-caps false alarms.
+  * Computer Vision Triage: Distinguishes surface trash (manual rod crew) from collapsed culverts/heavy silt (Vacuum Jetter).
+  * Contextual Priority Scoring: Synthesizes visual severity, water depth, and proximity to schools/hospitals into a 0–100 score.
+- Speaker Notes:
+  "Why use AI instead of simple IF/THEN rules? Because citizens don't speak in database codes. Our multimodal AI looks at the actual photo of the clogged manhole and reads informal Taglish to recommend the exact truck and crew needed."
+
+SLIDE 7: WEEKLY TIME & EFFORT SAVED CALCULATION (SET 3 Q2)
+- Slide Bullets:
+  * Manual Baseline: 14.0 mins/ticket x 75 tickets/week = 1,050 mins (17.5 hours/week).
+  * Automated Workflow: 1.0 min human review/ticket x 75 tickets/week = 75 mins (1.25 hours/week).
+  * Net Weekly Savings: 975 minutes = 16.25 hours saved every week (up to 43.3 hours/week saved during typhoon surges!).
+- Speaker Notes:
+  "Let's look at the math. By cutting per-ticket processing from 14 minutes down to a 1-minute human review, a single dispatch desk saves 975 minutes—or 16.25 hours—every single week."
+
+SLIDE 8: LIVE DEMO, DATA PRIVACY & CONCLUSION
+- Slide Bullets:
+  * Built-in Data Privacy: Purpose limitation, explicit consent banner, and automated `[REDACTED]` PII masking.
+  * Live Interactive GIS Map: Real-time Manila District I–VI pins, AI triage cards, and 1-click dispatch logs.
+  * Ready for immediate barangay and municipal deployment. Thank you!
+- Speaker Notes:
+  "Finally, our system is built with privacy-by-design and a live interactive GIS dashboard that you can test right now. Thank you, and we welcome your questions!"
+================================================================================

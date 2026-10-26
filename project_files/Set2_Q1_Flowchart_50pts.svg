@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1480" width="1200" height="1480" style="background:#081020;font-family:'Inter',system-ui,-apple-system,sans-serif;">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#311042"/>
+    </linearGradient>
+    <marker id="arrowCyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fbbf24"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f87171"/>
+    </marker>
+  </defs>
+
+  <rect x="30" y="24" width="1140" height="86" rx="14" fill="url(#headerGrad)"/>
+  <text x="600" y="58" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="800" letter-spacing="0.5">
+    SET 2 QUESTION 1: AUTOMATED PROBLEM-SOLVER WORKFLOW FLOWCHART (50 POINTS)
+  </text>
+  <text x="600" y="88" text-anchor="middle" fill="#e0f2fe" font-size="14" font-weight="500">
+    Workflow 1: Barangay Declogging &amp; GIS Smart Tracker  |  Workflow 2 (Teams &gt; 4): Drainage Water Quality &amp; H2S Safety Telemetry
+  </text>
+
+  <rect x="30" y="126" width="730" height="40" rx="8" fill="#0f172a" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="395" y="151" text-anchor="middle" fill="#38bdf8" font-size="15" font-weight="700">
+    WORKFLOW 1: BARANGAY DECLOGGING &amp; GIS SMART TRACKER (ALL TEAMS)
+  </text>
+
+  <rect x="780" y="126" width="390" height="40" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
+  <text x="975" y="151" text-anchor="middle" fill="#34d399" font-size="14" font-weight="700">
+    WORKFLOW 2: H2S &amp; WATER SAFETY (TEAMS &gt; 4)
+  </text>
+
+  <rect x="195" y="190" width="400" height="72" rx="36" fill="#064e3b" stroke="#34d399" stroke-width="2.5"/>
+  <text x="395" y="220" text-anchor="middle" fill="#ecfdf5" font-size="15" font-weight="800">START TRIGGER: CITIZEN / BARANGAY REPORT</text>
+  <text x="395" y="242" text-anchor="middle" fill="#a7f3d0" font-size="12">Web Form / Messenger Webhook + GPS Pin + Site Photo</text>
+
+  <line x1="395" y1="262" x2="395" y2="305" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+
+  <rect x="155" y="310" width="480" height="86" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+  <text x="395" y="338" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="800">STEP 1: DATA PRIVACY &amp; PII MASKING GUARDRAIL</text>
+  <text x="395" y="360" text-anchor="middle" fill="#cbd5e1" font-size="12">1. Verify Explicit Consent Notice checkbox</text>
+  <text x="395" y="380" text-anchor="middle" fill="#94a3b8" font-size="12">2. Regex Sanitizer masks accidental Gov IDs / TIN / Cards -&gt; [REDACTED]</text>
+
+  <line x1="395" y1="396" x2="395" y2="440" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+
+  <polygon points="395,445 575,520 395,595 215,520" fill="#1e293b" stroke="#fbbf24" stroke-width="2.5"/>
+  <text x="395" y="508" text-anchor="middle" fill="#fde68a" font-size="13" font-weight="800">DECISION GATE 1:</text>
+  <text x="395" y="526" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="600">Valid GPS/Street &amp; Unique</text>
+  <text x="395" y="544" text-anchor="middle" fill="#cbd5e1" font-size="11">(&gt;100m or &gt;48h from active ticket)?</text>
+
+  <line x1="215" y1="520" x2="115" y2="520" stroke="#f87171" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+  <text x="170" y="510" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">NO</text>
+
+  <rect x="30" y="550" width="175" height="118" rx="10" fill="#2a1215" stroke="#f87171" stroke-width="1.8"/>
+  <text x="117" y="576" text-anchor="middle" fill="#fca5a5" font-size="12" font-weight="800">AUTO-HOLD / MERGE</text>
+  <text x="117" y="598" text-anchor="middle" fill="#fecaca" font-size="11">• Incomplete: Request</text>
+  <text x="117" y="614" text-anchor="middle" fill="#fecaca" font-size="11">  exact landmark/pin</text>
+  <text x="117" y="634" text-anchor="middle" fill="#fecaca" font-size="11">• Duplicate (&lt;100m):</text>
+  <text x="117" y="650" text-anchor="middle" fill="#fecaca" font-size="11">  Add upvote to Master ID</text>
+
+  <line x1="395" y1="595" x2="395" y2="645" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <text x="435" y="625" text-anchor="middle" fill="#34d399" font-size="12" font-weight="700">YES (Valid &amp; Unique)</text>
+
+  <rect x="155" y="650" width="480" height="84" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+  <text x="395" y="678" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="800">STEP 2: AUTOMATED GIS SPATIAL DISTRICT ROUTING</text>
+  <text x="395" y="700" text-anchor="middle" fill="#cbd5e1" font-size="12">Point-in-Polygon check maps Lat/Lng to Manila District I–VI</text>
+  <text x="395" y="720" text-anchor="middle" fill="#94a3b8" font-size="12">+ Tags flood-prone elevation &amp; critical proximity (schools/hospitals)</text>
+
+  <line x1="395" y1="734" x2="395" y2="780" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+
+  <rect x="135" y="785" width="520" height="115" rx="14" fill="url(#aiGrad)" stroke="#c084fc" stroke-width="2.5"/>
+  <text x="395" y="814" text-anchor="middle" fill="#e9d5ff" font-size="15" font-weight="800">STEP 3: AI MULTIMODAL TRIAGE (GEMINI 2.5 FLASH)</text>
+  <text x="395" y="838" text-anchor="middle" fill="#f3e8ff" font-size="12">Analyzes Site Photo + English/Tagalog/Taglish Description -&gt; Outputs JSON:</text>
+  <text x="395" y="860" text-anchor="middle" fill="#d8b4fe" font-size="12">• Obstruction Class (Heavy Silt, Trash, Collapsed Culvert, Grease)</text>
+  <text x="395" y="880" text-anchor="middle" fill="#d8b4fe" font-size="12">• Urgency Score (0–100) + Equipment (Vacuum Jetter vs. Manual Rod Crew)</text>
+
+  <line x1="395" y1="900" x2="395" y2="948" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+
+  <polygon points="395,952 575,1025 395,1098 215,1025" fill="#1e293b" stroke="#fbbf24" stroke-width="2.5"/>
+  <text x="395" y="1014" text-anchor="middle" fill="#fde68a" font-size="13" font-weight="800">DECISION GATE 2:</text>
+  <text x="395" y="1032" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="600">AI Urgency Score &gt;= 80</text>
+  <text x="395" y="1049" text-anchor="middle" fill="#cbd5e1" font-size="11">or Main Road / Hospital Flood?</text>
+
+  <line x1="215" y1="1025" x2="145" y2="1025" stroke="#f87171" stroke-width="2.5"/>
+  <line x1="145" y1="1025" x2="145" y2="1135" stroke="#f87171" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+  <text x="175" y="1015" text-anchor="middle" fill="#f87171" font-size="12" font-weight="800">YES (&gt;=80)</text>
+
+  <rect x="35" y="1140" width="295" height="92" rx="12" fill="#3b0764" stroke="#f43f5e" stroke-width="2"/>
+  <text x="182" y="1168" text-anchor="middle" fill="#fda4af" font-size="13" font-weight="800">PRIORITY EMERGENCY DISPATCH</text>
+  <text x="182" y="1190" text-anchor="middle" fill="#ffe4e6" font-size="11">• Instant SMS/Webhook to District Engineer</text>
+  <text x="182" y="1210" text-anchor="middle" fill="#ffe4e6" font-size="11">• Reserve Vacuum Jetter + Trigger H2S Check</text>
+
+  <line x1="575" y1="1025" x2="625" y2="1025" stroke="#38bdf8" stroke-width="2.5"/>
+  <line x1="625" y1="1025" x2="625" y2="1135" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+  <text x="605" y="1015" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="800">NO (&lt;80)</text>
+
+  <rect x="460" y="1140" width="295" height="92" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+  <text x="607" y="1168" text-anchor="middle" fill="#7dd3fc" font-size="13" font-weight="800">SCHEDULED CLUSTER ROUTE</text>
+  <text x="607" y="1190" text-anchor="middle" fill="#cbd5e1" font-size="11">• Group by Barangay proximity</text>
+  <text x="607" y="1210" text-anchor="middle" fill="#cbd5e1" font-size="11">• Assign Declogging Rod / Manual Crew</text>
+
+  <line x1="182" y1="1232" x2="182" y2="1275" stroke="#34d399" stroke-width="2"/>
+  <line x1="607" y1="1232" x2="607" y2="1275" stroke="#34d399" stroke-width="2"/>
+  <line x1="182" y1="1275" x2="607" y2="1275" stroke="#34d399" stroke-width="2"/>
+  <line x1="395" y1="1275" x2="395" y2="1305" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+  <rect x="145" y="1310" width="500" height="68" rx="12" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
+  <text x="395" y="1338" text-anchor="middle" fill="#6ee7b7" font-size="14" font-weight="800">STEP 4: CENTRAL LOGGING &amp; CITIZEN RECEIPT</text>
+  <text x="395" y="1360" text-anchor="middle" fill="#cbd5e1" font-size="12">Log structured row to Dispatch Tracker + Send Ticket ID &amp; ETA to Citizen</text>
+
+  <line x1="395" y1="1378" x2="395" y2="1405" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+  <rect x="215" y="1408" width="360" height="50" rx="25" fill="#065f46" stroke="#34d399" stroke-width="2.5"/>
+  <text x="395" y="1438" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="800">END GOAL: DISPATCHED IN &lt;45s (SAVES 16.25 HRS/WK)</text>
+
+  <rect x="780" y="178" width="390" height="1280" rx="14" fill="#0b1528" stroke="#1e293b" stroke-width="1.5"/>
+
+  <rect x="805" y="200" width="340" height="68" rx="34" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+  <text x="975" y="228" text-anchor="middle" fill="#ecfdf5" font-size="13" font-weight="800">START TRIGGER (WORKFLOW 2)</text>
+  <text x="975" y="248" text-anchor="middle" fill="#a7f3d0" font-size="11">Pre-Entry Multi-Gas &amp; Water Sensor Telemetry</text>
+
+  <line x1="975" y1="268" x2="975" y2="315" stroke="#34d399" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <rect x="805" y="320" width="340" height="86" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+  <text x="975" y="346" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="800">STEP 1: SENSOR PAYLOAD INGESTION</text>
+  <text x="975" y="368" text-anchor="middle" fill="#cbd5e1" font-size="11">Parse H2S (ppm), Dissolved O2 (%),</text>
+  <text x="975" y="386" text-anchor="middle" fill="#cbd5e1" font-size="11">pH Level, Turbidity (NTU) &amp; Manhole ID</text>
+
+  <line x1="975" y1="406" x2="975" y2="455" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+  <rect x="805" y="460" width="340" height="100" rx="10" fill="url(#aiGrad)" stroke="#c084fc" stroke-width="2"/>
+  <text x="975" y="488" text-anchor="middle" fill="#e9d5ff" font-size="13" font-weight="800">STEP 2: AI ANOMALY &amp; GAS CORRELATION</text>
+  <text x="975" y="510" text-anchor="middle" fill="#f3e8ff" font-size="11">Detects illegal chemical dumping vs. organic</text>
+  <text x="975" y="528" text-anchor="middle" fill="#f3e8ff" font-size="11">sewer gas pockets &amp; predicts toxic spikes</text>
+  <text x="975" y="546" text-anchor="middle" fill="#d8b4fe" font-size="11">Recommends exact PPE &amp; blower duration</text>
+
+  <line x1="975" y1="560" x2="975" y2="615" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+  <polygon points="975,620 1135,695 975,770 815,695" fill="#1e293b" stroke="#fbbf24" stroke-width="2.5"/>
+  <text x="975" y="682" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="800">SAFETY GATE:</text>
+  <text x="975" y="700" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="600">H2S &gt;= 10 ppm OR O2 &lt; 19.5%</text>
+  <text x="975" y="716" text-anchor="middle" fill="#cbd5e1" font-size="11">OR pH outside 6.0–8.5?</text>
+
+  <line x1="975" y1="770" x2="975" y2="830" stroke="#f87171" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+  <text x="1035" y="805" text-anchor="middle" fill="#f87171" font-size="11" font-weight="800">YES (HAZARD!)</text>
+
+  <rect x="805" y="835" width="340" height="110" rx="10" fill="#3b0764" stroke="#f43f5e" stroke-width="2"/>
+  <text x="975" y="862" text-anchor="middle" fill="#fda4af" font-size="13" font-weight="800">RED ALERT: LOCK CONFINED ENTRY</text>
+  <text x="975" y="884" text-anchor="middle" fill="#ffe4e6" font-size="11">• Block work order status automatically</text>
+  <text x="975" y="904" text-anchor="middle" fill="#ffe4e6" font-size="11">• Mandate Forced Air Blower + SCBA Gear</text>
+  <text x="975" y="924" text-anchor="middle" fill="#ffe4e6" font-size="11">• Alert Municipal Safety Officer &amp; DENR</text>
+
+  <line x1="975" y1="945" x2="975" y2="1005" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrowAmber)"/>
+  <text x="1040" y="980" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700">After Re-Test Safe</text>
+
+  <rect x="805" y="1010" width="340" height="96" rx="10" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
+  <text x="975" y="1038" text-anchor="middle" fill="#6ee7b7" font-size="13" font-weight="800">GREEN PERMIT: AUTHORIZE ENTRY</text>
+  <text x="975" y="1060" text-anchor="middle" fill="#cbd5e1" font-size="11">• Issue Digital Confined-Space Permit</text>
+  <text x="975" y="1080" text-anchor="middle" fill="#cbd5e1" font-size="11">• Log Audit Timestamp to Safety Ledger</text>
+
+  <line x1="975" y1="1106" x2="975" y2="1175" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+  <rect x="805" y="1180" width="340" height="64" rx="32" fill="#065f46" stroke="#34d399" stroke-width="2.5"/>
+  <text x="975" y="1208" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="800">END GOAL (WORKFLOW 2)</text>
+  <text x="975" y="1228" text-anchor="middle" fill="#a7f3d0" font-size="11">Zero Gas Injuries + Clearance in &lt;15 Secs</text>
+</svg>

@@ -1,0 +1,48 @@
+================================================================================
+SET 1 OF 4: DEFINE YOUR PROBLEM (30 POINTS TOTAL — 3 QUESTIONS)
+Course: Implement Basic Automation Techniques Using AI Tools
+Project: Automated Problem-Solver Project — Design Your Custom Workflow
+================================================================================
+
+--------------------------------------------------------------------------------
+QUESTION 1 (10 Points)
+What is the specific, real-world problem your workflow solves? *
+--------------------------------------------------------------------------------
+
+[WORKFLOW 1 — Barangay Declogging & GIS Smart Tracker (For All Teams 1–4+ Members)]:
+Municipal public works engineering offices (such as Manila DEPW) and barangay dispatchers face severe daily bottlenecks processing unstructured drainage declogging, manhole rehabilitation, and street flood reports sent across scattered Facebook pages, Viber groups, emails, and walk-in desks. Clerks spend 10 to 15 minutes per report manually reading vague messages, cross-checking street names against maps to figure out which of the 6 engineering districts has jurisdiction, checking spreadsheets for duplicate complaints, and typing job orders. During heavy rains, this manual process causes a 24-to-48-hour backlog, dispatches Vacuum Jetter trucks to duplicate or wrong locations, and risks exposing citizen personal data (phone numbers and IDs) in public chat threads.
+
+[WORKFLOW 2 — Drainage Water Quality & H2S Safety Telemetry (Additional for Teams > 4 Members)]:
+Engineering field crews entering underground drainage laterals and box culverts face hidden, life-threatening hazards from toxic Hydrogen Sulfide (H2S) gas pockets, low dissolved oxygen, and illegal chemical waste dumping. Manually logging paper water-quality checklists and calling supervisors for safety clearance delays emergency declogging operations by 30 to 45 minutes per site and leaves crews vulnerable to sudden toxic gas spikes without automated evacuation triggers or PPE compliance enforcement.
+
+
+--------------------------------------------------------------------------------
+QUESTION 2 (10 Points)
+Who is the main person or group that benefits from this workflow? *
+--------------------------------------------------------------------------------
+
+[WORKFLOW 1 — Barangay Declogging & GIS Smart Tracker]:
+1. Primary Beneficiaries: Municipal Public Works Dispatchers, District Engineers (Districts I–VI), and Field Declogging Crews—who eliminate repetitive manual data entry, avoid wasted fuel on duplicate or misrouted trips, and receive pre-triaged, GPS-pinned work orders with exact equipment recommendations.
+2. Secondary Beneficiaries: Barangay Officials and Local Citizens/Residents—who receive instant 24/7 ticket confirmation, privacy-protected reporting, and faster flood-mitigation response times in their neighborhoods.
+
+[WORKFLOW 2 — Drainage Water Quality & H2S Safety Telemetry (For Teams > 4 Members)]:
+1. Primary Beneficiaries: Underground Drainage Maintenance Workers, Confined-Space Entry Crews, and Municipal Safety Officers—who receive real-time automated go/no-go safety clearances, mandatory respiratory PPE alerts, and instant hazard lockdowns before entering dangerous manholes.
+2. Secondary Beneficiaries: Environmental Compliance Inspectors and nearby Barangay Communities—who are protected from toxic sewer gas leaks and illegal industrial discharge.
+
+
+--------------------------------------------------------------------------------
+QUESTION 3 (10 Points)
+Why is solving this problem important? What is the impact (time saved, reduced errors, better service, etc.)? *
+--------------------------------------------------------------------------------
+
+[WORKFLOW 1 — Barangay Declogging & GIS Smart Tracker]:
+1. Massive Time Savings: Cuts per-ticket intake, district verification, and dispatch triage time from 14 minutes down to 45 seconds (a 95% reduction, saving 975 minutes or 16.25 staff-hours every week at 75 tickets/week).
+2. Reduced Routing & Dispatch Errors: Automated GIS point-in-polygon district boundary checks and 100-meter radius deduplication eliminate misrouted crews and duplicate truck dispatches.
+3. Faster Flood Prevention & Public Service: Urgent main-thoroughfare blockages and school/hospital flood hazards are prioritized automatically within seconds, preventing severe urban flooding and property damage.
+4. Strict Data Privacy Compliance: Automated regex masking strips accidental government IDs or financial data before storage and enforces explicit user consent.
+
+[WORKFLOW 2 — Drainage Water Quality & H2S Safety Telemetry (For Teams > 4 Members)]:
+1. Zero Confined-Space Fatalities & Injuries: Automatically blocks crew entry within 3 seconds when H2S exceeds 10 ppm or pH falls outside 6.0–8.5, preventing toxic gas inhalation.
+2. Faster Safety Clearance: Reduces pre-entry environmental review and PPE verification from 35 minutes of manual phone calls to under 15 seconds.
+3. Audit-Ready Compliance: Creates tamper-proof safety telemetry logs for every drainage operation.
+================================================================================

@@ -1,0 +1,161 @@
+================================================================================
+SET 2 — QUESTION 1: UPLOAD YOUR FLOWCHART HERE * (50 POINTS)
+ASCII + MERMAID + STEP-BY-STEP DECISION GATE FLOWCHART
+================================================================================
+
+--------------------------------------------------------------------------------
+1. WORKFLOW 1 FLOWCHART: BARANGAY DECLOGGING & GIS SMART TRACKER
+   (Required for All Teams: 1 to 4+ Members)
+--------------------------------------------------------------------------------
+
+                         +-----------------------------------------+
+                         |              START TRIGGER              |
+                         |  Citizen / Barangay submits report via  |
+                         |  Web Form or Webhook (Photo + GPS Pin)  |
+                         +--------------------+--------------------+
+                                              |
+                                              v
+                         +-----------------------------------------+
+                         |   STEP 1: DATA PRIVACY & PII GUARDRAIL  |
+                         |  1. Verify Explicit Consent checkbox    |
+                         |  2. Regex masks Gov IDs/TIN/Cards       |
+                         |     -> Replaces with [REDACTED]         |
+                         +--------------------+--------------------+
+                                              |
+                                              v
+                                     /-----------------\
+                                    /  DECISION GATE 1  \
+                                   /  Valid GPS/Address  \
+                                  <   AND Unique Ticket   >
+                                   \  (>100m or >48 hrs) /
+                                    \   from active?    /
+                                     \-----------------/
+                                       /             \
+              [NO: Incomplete or      /               \  [YES: Valid & Unique]
+               Duplicate <100m]      v                 v
+        +-------------------------------+    +-----------------------------------------+
+        |     AUTO-HOLD / DEDUPLICATE   |    |   STEP 2: AUTOMATED GIS SPATIAL ROUTING |
+        | - Incomplete: Auto-reply to   |    | - Point-in-Polygon maps GPS coordinate  |
+        |   request street/landmark pin |    |   to Manila Engineering District I-VI   |
+        | - Duplicate (<100m in 48h):   |    | - Flags low-lying flood elevation &     |
+        |   Add +1 Upvote to Master ID  |    |   proximity to schools / hospitals      |
+        +-------------------------------+    +--------------------+--------------------+
+                                                                  |
+                                                                  v
+                                             +-----------------------------------------+
+                                             |   STEP 3: AI MULTIMODAL TRIAGE ENGINE   |
+                                             |           (Gemini 2.5 Flash)            |
+                                             | - Analyzes Site Photo + Taglish/English |
+                                             | - Classifies Obstruction (Heavy Silt,   |
+                                             |   Trash, Collapsed Culvert, Grease)     |
+                                             | - Computes Urgency Score (0-100)        |
+                                             | - Selects Crew & Equipment (Vacuum      |
+                                             |   Jetter vs. Manual Declogging Rod)     |
+                                             +--------------------+--------------------+
+                                                                  |
+                                                                  v
+                                                         /-----------------\
+                                                        /  DECISION GATE 2  \
+                                                       <  AI Score >= 80 OR  >
+                                                        \ Critical Hazard?  /
+                                                         \-----------------/
+                                                           /             \
+                                  [YES: Critical >= 80]   /               \   [NO: Score < 80]
+                                                         v                 v
+                                  +----------------------------+     +----------------------------+
+                                  | PRIORITY EMERGENCY ALERT   |     |  DAILY ROUTE BATCH QUEUE   |
+                                  | - Instant SMS/Webhook to   |     | - Group by Barangay        |
+                                  |   District Duty Engineer   |     |   cluster for optimal fuel |
+                                  | - Reserve Vacuum Jetter    |     | - Assign Manual Rod Crew   |
+                                  +-------------+--------------+     +-------------+--------------+
+                                                \                                 /
+                                                 \---------------+---------------/
+                                                                 |
+                                                                 v
+                                             +-----------------------------------------+
+                                             |   STEP 4: CENTRAL LOG & CITIZEN RECEIPT |
+                                             | - Append structured row to Dispatch DB  |
+                                             | - Send Ticket ID & ETA to Citizen       |
+                                             +--------------------+--------------------+
+                                                                  |
+                                                                  v
+                                             +-----------------------------------------+
+                                             |                END GOAL                 |
+                                             |   Pre-triaged crew dispatched in <45s   |
+                                             |     (Saves 975 mins / 16.25 hrs/wk)     |
+                                             +-----------------------------------------+
+
+
+--------------------------------------------------------------------------------
+2. WORKFLOW 2 FLOWCHART: DRAINAGE WATER QUALITY & H2S SAFETY TELEMETRY
+   (Additional Workflow for Teams with > 4 Members)
+--------------------------------------------------------------------------------
+
+                         +-----------------------------------------+
+                         |       START TRIGGER (WORKFLOW 2)        |
+                         |  Field crew submits pre-entry multi-gas |
+                         |  & water sensor reading at manhole site |
+                         +--------------------+--------------------+
+                                              |
+                                              v
+                         +-----------------------------------------+
+                         |   STEP 1: TELEMETRY INGESTION & CHECK   |
+                         |  Parse H2S (ppm), Dissolved O2 (%),     |
+                         |  pH (0-14), Turbidity (NTU), & Site ID  |
+                         +--------------------+--------------------+
+                                              |
+                                              v
+                         +-----------------------------------------+
+                         |   STEP 2: AI HAZARD & ANOMALY ENGINE    |
+                         |  Correlates multi-sensor trends against |
+                         |  historical culvert baselines to detect |
+                         |  illegal chemical dumping vs sewer gas  |
+                         +--------------------+--------------------+
+                                              |
+                                              v
+                                     /-----------------\
+                                    /   SAFETY GATE     \
+                                   <  H2S >= 10 ppm OR   >
+                                    \ O2 < 19.5% OR pH  /
+                                     \ outside 6.0-8.5?/
+                                      \---------------/
+                                       /             \
+               [YES: Hazard Detected] /               \ [NO: All Readings Safe]
+                                     v                 v
+              +------------------------------+   +------------------------------+
+              | RED ALERT: AUTO-LOCK ENTRY   |   | GREEN CLEARANCE: ISSUE PERMIT|
+              | - Block manhole entry status |   | - Generate Digital Confined- |
+              | - Mandate Forced Ventilation |   |   Space Entry Permit         |
+              |   Blower + SCBA Respirator   |   | - Log compliance timestamp   |
+              | - Alert Safety Officer       |   | - Authorize declogging crew  |
+              +--------------+---------------+   +--------------+---------------+
+                              \                                 /
+                               \---------------+---------------/
+                                               |
+                                               v
+                         +-----------------------------------------+
+                         |          END GOAL (WORKFLOW 2)          |
+                         |  Zero confined-space gas injuries &     |
+                         |  automated safety clearance in <15 secs |
+                         +-----------------------------------------+
+
+
+--------------------------------------------------------------------------------
+3. MERMAID.JS CODE (Copy-paste into Mermaid Live Editor, Notion, or GitHub)
+--------------------------------------------------------------------------------
+
+```mermaid
+flowchart TD
+    Start(["START TRIGGER: Citizen / Barangay Flood or Declogging Report"]) --> Step1["STEP 1: Data Privacy & PII Guardrail<br/>Verify Explicit Consent + Regex Mask Sensitive IDs"]
+    Step1 --> Gate1{"DECISION GATE 1:<br/>Valid GPS/Street & Unique<br/>(>100m or >48h)?"}
+    Gate1 -- "NO (Incomplete / Duplicate)" --> Hold["Auto-Reply for Missing Pin OR<br/>Merge as +1 Upvote on Master Ticket"]
+    Gate1 -- "YES (Valid & Unique)" --> Step2["STEP 2: Automated GIS Spatial Routing<br/>Point-in-Polygon -> Manila District I–VI"]
+    Step2 --> Step3["STEP 3: AI Multimodal Triage (Gemini 2.5 Flash)<br/>Analyze Photo + Taglish/English -> Score 0-100 & Equipment"]
+    Step3 --> Gate2{"DECISION GATE 2:<br/>Urgency Score >= 80<br/>or Critical Hazard?"}
+    Gate2 -- "YES (Critical >= 80)" --> Crit["Instant Emergency Alert to District Engineer<br/>+ Reserve Vacuum Jetter + Trigger H2S Safety Check"]
+    Gate2 -- "NO (Standard < 80)" --> Batch["Queue in Barangay Cluster Route<br/>+ Assign Declogging Rod / Manual Crew"]
+    Crit --> Step4["STEP 4: Log to Central Dispatch DB & Send Ticket ID Receipt"]
+    Batch --> Step4
+    Step4 --> EndNode(["END GOAL: Crew Dispatched in <45s (Saves 16.25 hrs/week)"])
+```
+================================================================================

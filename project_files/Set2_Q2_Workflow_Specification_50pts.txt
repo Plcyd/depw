@@ -1,0 +1,92 @@
+================================================================================
+SET 2 OF 4 — QUESTION 2: UPLOAD YOUR WORKFLOW HERE * (50 POINTS)
+COMPLETE STEP-BY-STEP AUTOMATED WORKFLOW SPECIFICATION
+================================================================================
+
+--------------------------------------------------------------------------------
+WORKFLOW 1: BARANGAY DECLOGGING & GIS SMART TRACKER (ALL TEAMS)
+--------------------------------------------------------------------------------
+
+1. WORKFLOW OVERVIEW
+   - Workflow Name: Automated Barangay Declogging & GIS Smart Dispatch Workflow
+   - Goal: Automate citizen drainage/flood report intake, PII privacy redaction, GIS District I–VI routing, 100-meter spatial deduplication, AI multimodal severity scoring, and crew dispatch notification.
+
+2. INPUTS & START TRIGGER
+   - Trigger Type: Real-time HTTP Webhook / Web Portal Submission
+   - Payload Fields:
+     * `reporterName` (string, optional/minimized)
+     * `contactNumber` (string, strictly for ticket coordination)
+     * `consentAccepted` (boolean, must be `true`)
+     * `barangay` & `streetAddress` (string)
+     * `latitude` & `longitude` (float, GPS coordinates from interactive map pin)
+     * `description` (string, unstructured English/Tagalog/Taglish text)
+     * `photoUrl` / `photoBase64` (image of flooded street or clogged manhole)
+
+3. STEP-BY-STEP AUTOMATED NODES & DECISION GATES
+
+   [NODE 1: DATA PRIVACY & PII GUARDRAIL (Rule-Based Filter)]
+   - Action:
+     a) Verify `consentAccepted === true` under the Explicit Consent Notice.
+     b) Run Regex Pattern Sanitizer on `description` to mask accidental sensitive identifiers (12-digit Government IDs, TIN, credit card numbers, passwords) with `[REDACTED]`.
+   - Output: Sanitized, privacy-compliant report object.
+
+   [DECISION GATE 1: COMPLETENESS & 100m SPATIAL DEDUPLICATION]
+   - Condition A (Completeness): Does the payload contain valid coordinates (`lat`, `lng`) AND a street/barangay description?
+     * IF FALSE -> Send automated reply requesting missing pin/landmark; set status to `AWAITING_INFO`.
+   - Condition B (Spatial Deduplication): Query active tickets from the past 48 hours using the Haversine distance formula:
+     `distance_meters(new_lat, new_lng, existing_lat, existing_lng) <= 100`
+     * IF TRUE (Duplicate within 100m & 48h) -> Increment `upvoteCount` on the existing Master Ticket, append reporter contact to subscriber list, and send instant receipt with the Master Ticket ID. Stop new ticket creation.
+     * IF FALSE (Unique Ticket) -> Proceed to Node 2.
+
+   [NODE 2: AUTOMATED GIS POINT-IN-POLYGON ROUTING]
+   - Action:
+     a) Execute Ray-Casting Point-in-Polygon check of `(latitude, longitude)` against Manila Engineering Districts I–VI GeoJSON polygons.
+     b) Cross-reference coordinates against low-lying flood elevation zones and critical infrastructure buffers (within 200m of hospitals, schools, or pumping stations).
+   - Output: `assignedDistrict` (District I–VI) and `criticalZoneFlag` (boolean).
+
+   [NODE 3: AI MULTIMODAL TRIAGE & EQUIPMENT CLASSIFIER (Gemini 2.5 Flash)]
+   - Action: Send sanitized text + site photo + GIS context to Gemini 2.5 Flash with structured JSON output schema:
+     * `obstructionType`: `"Heavy Silt"` | `"Solid Waste / Plastic"` | `"Grease / Fatberg"` | `"Collapsed Culvert / Manhole"`
+     * `urgencyScore`: Integer `0–100`
+     * `priorityTier`: `"Critical"` (80–100) | `"High"` (60–79) | `"Medium"` (40–59) | `"Low"` (0–39)
+     * `recommendedEquipment`: `"Vacuum Jetter Truck"` | `"Clamshell Excavator"` | `"Manual Declogging Rod Crew"`
+     * `engineeringSummary`: 1-sentence technical dispatch briefing.
+
+   [DECISION GATE 2: PRIORITY DISPATCH ROUTING]
+   - Condition: Is `urgencyScore >= 80` OR `criticalZoneFlag === true`?
+     * IF YES (Critical Emergency):
+       1. Trigger immediate SMS/Webhook alert to District Duty Engineer.
+       2. Auto-reserve District Vacuum Jetter Unit.
+       3. Flag ticket for mandatory pre-entry H2S gas check (links to Workflow 2).
+     * IF NO (Standard Priority < 80):
+       1. Group ticket into the District's daily Barangay Route Optimization Batch.
+       2. Assign standard Declogging Rod / Manual Maintenance Crew.
+
+   [NODE 4: CENTRAL DATABASE PERSISTENCE & CITIZEN CONFIRMATION]
+   - Action:
+     a) Append complete structured row to Central Dispatch Tracker (Database / Google Sheets).
+     b) Send automated confirmation receipt to the citizen/Barangay Captain with Reference Ticket ID, Assigned District, Recommended Crew, and estimated response window.
+
+
+--------------------------------------------------------------------------------
+WORKFLOW 2: DRAINAGE WATER QUALITY & H2S SAFETY TELEMETRY (FOR TEAMS > 4)
+--------------------------------------------------------------------------------
+
+1. WORKFLOW OVERVIEW
+   - Workflow Name: Automated Confined-Space H2S Gas & Water Quality Safety Gatekeeper
+   - Goal: Prevent toxic gas injuries and environmental hazards by automating pre-entry multi-gas and water telemetry checks before drainage crews enter underground culverts.
+
+2. INPUTS & START TRIGGER
+   - Trigger: Field crew or portable IoT multi-gas probe submits pre-entry telemetry at a manhole site (`ticketId`, `h2s_ppm`, `oxygen_pct`, `ph_level`, `turbidity_ntu`, `temperature_c`).
+
+3. STEP-BY-STEP NODES & DECISION GATES
+   - [NODE 1: OSHA/NIOSH THRESHOLD VALIDATION]
+     Checks strict safety rules: `h2s_ppm < 10.0`, `19.5 <= oxygen_pct <= 23.5`, and `6.0 <= ph_level <= 8.5`.
+   - [NODE 2: AI MULTI-PARAMETER ANOMALY CORRELATION]
+     Analyzes combined chemical signature (e.g., low pH + high turbidity + rising H2S) to distinguish illegal industrial acid/chemical dumping from organic silt decay, generating tailored PPE and ventilation instructions.
+   - [DECISION GATE: SAFE FOR ENTRY?]
+     * IF HAZARD DETECTED (`h2s_ppm >= 10` OR `oxygen_pct < 19.5` OR `ph` out of range):
+       -> Lock Work Order (`STATUS = HOLD_HAZARD_LOCKED`), mandate 30-minute Forced Air Blower ventilation + SCBA breathing apparatus, and page the Municipal Safety Officer.
+     * IF SAFE:
+       -> Issue Digital Confined-Space Entry Permit (`STATUS = CLEARED_FOR_ENTRY`) and log immutable compliance timestamp.
+================================================================================

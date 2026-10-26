@@ -1,0 +1,65 @@
+================================================================================
+SET 3 OF 4: FINAL REVIEW (70 POINTS TOTAL — 2 QUESTIONS)
+Course: Implement Basic Automation Techniques Using AI Tools
+Project: Automated Problem-Solver Project — Design Your Custom Workflow
+================================================================================
+
+--------------------------------------------------------------------------------
+QUESTION 1 (35 Points)
+How does your workflow use AI to improve the process?
+(Explain what makes it smarter than a simple rule-based automation.) *
+--------------------------------------------------------------------------------
+
+[COMPLETE ANSWER]:
+A simple rule-based automation (such as basic IF/THEN keyword filters or standard form-to-sheet scripts) fails in real-world municipal reporting because citizens write in unstructured English, Tagalog, or Taglish, use inconsistent street descriptions, and upload photos without technical labels. For example, a rule looking for the word "flood" might miss a critical report that says "Tubig hanggang tuhod sa tapat ng health center, barado ng sako-sakong basura ang imburnal" ("Knee-deep water in front of the health center, drainage blocked by sacks of garbage") or over-prioritize a minor puddle just because the user typed "URGENT!!!" in all caps.
+
+Our workflow uses Multimodal AI (Gemini 2.5 Flash) to make the system genuinely intelligent in four ways:
+
+1. Visual Severity & Obstruction Recognition (Computer Vision):
+   Instead of relying on user checkboxes, the AI inspects the uploaded site photo to distinguish between surface litter (solvable by a 2-person manual crew with declogging rods) and compacted silt, grease buildup, or a collapsed concrete box culvert (which requires dispatching a heavy Vacuum Jetter truck or Clamshell excavator).
+
+2. Multilingual & Contextual Natural Language Understanding:
+   The AI naturally understands English, Tagalog, and Taglish descriptions, extracting the exact landmark, water depth, and public risk (such as proximity to schools, hospitals, or main arteries) even from informal conversational messages.
+
+3. Multi-Factor Dynamic Priority Scoring (0–100):
+   Rather than a rigid First-In-First-Out (FIFO) queue or brittle keyword rules, the AI synthesizes visual evidence, text context, weather conditions, and GIS flood-zone elevation to generate an objective 0–100 Urgency Score and a concise 1-sentence engineering briefing for the dispatch crew.
+
+4. Intelligent Hazard & Anomaly Synthesis (Workflow 2 — For Teams > 4):
+   In our companion Water Quality & H2S Safety workflow, AI correlates subtle multi-sensor patterns (such as gradual H2S rise combined with abnormal pH and turbidity) to identify upstream illegal chemical dumping vs. normal organic sewer gas—predicting toxic spikes before they breach static alarm thresholds.
+
+
+--------------------------------------------------------------------------------
+QUESTION 2 (35 Points)
+Estimate how much time or effort your workflow could save per week.
+Show your calculation or reasoning. *
+--------------------------------------------------------------------------------
+
+[COMPLETE ANSWER WITH STEP-BY-STEP CALCULATION]:
+
+Headline Estimate:
+Our automated workflow saves 975 minutes (16.25 hours) of manual staff effort per week for a single municipal engineering dispatch desk handling an average of 75 declogging/flood reports per week—representing a 94.6% reduction in processing time (over 2 full 8-hour workdays saved every week).
+
+Step 1 — Baseline Manual Process (Before Automation) = 14.0 Minutes per Report:
+  • Reading unstructured message, checking photo, and replying for missing info: 3.0 mins
+  • Looking up street/barangay on a map to verify District I–VI boundary: 3.5 mins
+  • Searching existing spreadsheet logs to check for duplicate reports: 2.5 mins
+  • Assessing severity, deciding equipment needed, and typing row into tracker: 3.0 mins
+  • Sending confirmation message & forwarding work order to District Engineer: 2.0 mins
+  ------------------------------------------------------------------------------
+  Total Manual Time per Report = 14.0 minutes
+  Weekly Manual Effort (75 reports/week × 14.0 mins) = 1,050 minutes (17.5 hours/week)
+
+Step 2 — Automated AI + GIS Workflow (After Automation) = 1.0 Minute per Report:
+  • Intake, PII privacy masking, GIS District lookup, 100m duplicate check, AI photo/text triage, and database logging run automatically in 5 to 10 seconds (0 minutes of manual typing).
+  • Human-in-the-loop dispatcher simply reviews the pre-filled AI recommendation card and clicks "Approve Dispatch": 1.0 minute per report.
+  ------------------------------------------------------------------------------
+  Total Human Time per Report = 1.0 minute
+  Weekly Human Effort (75 reports/week × 1.0 min) = 75 minutes (1.25 hours/week)
+
+Step 3 — Net Weekly Time & Effort Saved Calculation:
+  • Time Saved per Report = 14.0 mins − 1.0 min = 13.0 minutes saved per report (92.9% per-ticket reduction; 94.6% automated execution)
+  • Weekly Time Saved (Standard Week @ 75 reports) = 75 × 13.0 mins = 975 minutes = 16.25 hours/week saved
+  • Typhoon / Monsoon Surge Week (@ 200 reports) = 200 × 13.0 mins = 2,600 minutes = 43.33 hours/week saved
+  • Additional Savings for 5+ Member Teams (Workflow 2 — H2S & Water Safety):
+    Automating 30 pre-entry manhole safety clearances per week saves 15 minutes of manual supervisor phone coordination per site = 450 minutes (7.5 additional hours/week saved), bringing combined two-workflow savings to 1,425 minutes (23.75 hours/week).
+================================================================================
