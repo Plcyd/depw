@@ -440,9 +440,68 @@ test('Automated Problem-Solver Project – Design Your Custom Workflow matches 4
     workflow2Answers: { 'ITEM-1': '' }, // empty 2nd workflow item 1 loses half points on item 1
   });
   assert.equal(groupOf5.requiredWorkflowCount, 2);
-  assert.equal(groupOf5.earnedScore, 240);
+  assert.equal(groupOf5.earnedScore, 245);
   assert.equal(groupOf5.passed, true);
 });
+
+test('themeConfig manages CSS variables and cycling for navy-glass, daylight-civic, and emerald-hydro themes', async () => {
+  const {
+    CORE_THEME_IDS,
+    THEME_CSS_VARIABLES,
+    resolveValidThemeId,
+    getThemeVariables,
+    getNextThemeId,
+  } = await import('./themeConfig.js');
+
+  assert.deepEqual(CORE_THEME_IDS, ['navy-glass', 'daylight-civic', 'emerald-hydro']);
+  assert.equal(resolveValidThemeId('invalid-theme'), 'navy-glass');
+  assert.equal(resolveValidThemeId('emerald-hydro'), 'emerald-hydro');
+
+  const navyVars = getThemeVariables('navy-glass');
+  const daylightVars = getThemeVariables('daylight-civic');
+  const emeraldVars = getThemeVariables('emerald-hydro');
+
+  assert.equal(navyVars['--bg-navy-deep'], '#060d1f');
+  assert.equal(daylightVars['--bg-navy-deep'], '#f1f5f9');
+  assert.equal(emeraldVars['--bg-navy-deep'], '#041d1b');
+  assert.ok(Object.keys(THEME_CSS_VARIABLES['navy-glass']).length >= 16);
+
+  assert.equal(getNextThemeId('navy-glass'), 'daylight-civic');
+  assert.equal(getNextThemeId('daylight-civic'), 'emerald-hydro');
+  assert.equal(getNextThemeId('emerald-hydro'), 'navy-glass');
+});
+
+test('pptGenerator generates 8 animated slides, PowerPoint .ppt, standalone animated HTML, Flowchart SVG, and Workflow TXT', async () => {
+  const {
+    buildAnimatedProjectSlides,
+    generatePowerPointPptContent,
+    generateAnimatedHtmlDeckContent,
+    generateFlowchartSvgContent,
+    generateWorkflowSpecificationDoc,
+  } = await import('./pptGenerator.js');
+
+  const slides = buildAnimatedProjectSlides();
+  assert.equal(slides.length, 8);
+  assert.ok(slides[0].title.includes('Automated Problem-Solver Project'));
+
+  const pptContent = generatePowerPointPptContent();
+  assert.ok(pptContent.includes('xmlns:p="urn:schemas-microsoft-com:office:powerpoint"'));
+  assert.ok(pptContent.includes('Set 1: The Problem, The Trigger (Start), and The Goal (End)'));
+
+  const htmlContent = generateAnimatedHtmlDeckContent();
+  assert.ok(htmlContent.toLowerCase().includes('<!doctype html>'));
+  assert.ok(htmlContent.includes('toggleAutoplay()'));
+
+  const svgContent = generateFlowchartSvgContent();
+  assert.ok(svgContent.includes('<svg'));
+  assert.ok(svgContent.includes('STAGE 01'));
+  assert.ok(svgContent.includes('STAGE 08'));
+
+  const txtContent = generateWorkflowSpecificationDoc();
+  assert.ok(txtContent.includes('AUTOMATED PROBLEM-SOLVER PROJECT'));
+  assert.ok(txtContent.includes('SET 2: DESIGN YOUR WORKFLOW'));
+});
+
 
 
 

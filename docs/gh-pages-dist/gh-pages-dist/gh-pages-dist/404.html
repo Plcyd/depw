@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DEPW Assist Manila — Redirecting...</title>
+    <script>
+      // GitHub Pages SPA 404 redirect helper: preserves repository subpath and redirects to HashRouter
+      (function () {
+        var l = window.location;
+        var segments = l.pathname.split('/').filter(Boolean);
+        // If hosted under https://<user>.github.io/<repo>/..., keep the first segment (<repo>)
+        var isProjectPage = l.hostname.indexOf('github.io') !== -1 && segments.length > 0;
+        var basePath = isProjectPage ? '/' + segments[0] + '/' : '/';
+        var routeRest = isProjectPage ? segments.slice(1).join('/') : segments.join('/');
+        var targetHash = l.hash || (routeRest ? '#/' + routeRest : '#/');
+        l.replace(l.protocol + '//' + l.host + basePath + targetHash);
+      })();
+    </script>
+  </head>
+  <body style="background: #060d1f; color: #f8fafc; font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
+    <p>Redirecting to DEPW Assist Manila Dashboard...</p>
+  </body>
+</html>

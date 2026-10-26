@@ -41,6 +41,7 @@ import WaterQualityZoneLogger from './components/WaterQualityZoneLogger.jsx';
 import AutomatedProblemSolverProjectView from './components/AutomatedProblemSolverProjectView.jsx';
 import ThemeSwitcher from './components/ThemeSwitcher.jsx';
 import UserProfileTopBar from './components/UserProfileTopBar.jsx';
+import { useTheme } from './context/ThemeContext.jsx';
 import { DEPW_OFFICER_PROFILES } from './utils/workflowRules.js';
 import { api } from './services/api.js';
 import { initAuth, googleSignIn, logout } from './services/firebaseClient.js';
@@ -48,8 +49,10 @@ import { initAuth, googleSignIn, logout } from './services/firebaseClient.js';
 export default function App({ initialRouteTab = 'command' }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { themeId, setThemeId } = useTheme();
 
   const [activeTab, setActiveTab] = useState(initialRouteTab || 'command');
+  const [blankSurroundingChrome, setBlankSurroundingChrome] = useState(true);
   const [simpleNavMode, setSimpleNavMode] = useState(() => {
     try {
       const saved = localStorage.getItem('depw_simple_nav');
@@ -73,17 +76,6 @@ export default function App({ initialRouteTab = 'command' }) {
     return DEPW_OFFICER_PROFILES[0];
   });
 
-  const [themeId, setThemeId] = useState(() => {
-    try {
-      return (
-        localStorage.getItem('depw_theme_id') ||
-        localStorage.getItem('theme') ||
-        'navy-glass'
-      );
-    } catch {
-      return 'navy-glass';
-    }
-  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -366,26 +358,86 @@ export default function App({ initialRouteTab = 'command' }) {
     }
   };
 
+  const isProjectBlankFocus = activeTab === 'project' && blankSurroundingChrome;
+
   return (
     <div className={styles.appShell} data-theme={themeId}>
       {/* Ambient Background Glows */}
       <div className={styles.ambientGlowTop} />
       <div className={styles.ambientGlowBottom} />
 
-      {/* Official City of Manila Architectural Skyline Header Strip (Outline only, conforms to active theme) */}
-      <div style={{ width: '100%', borderBottom: '1px solid var(--glass-border)', background: 'transparent' }}>
-        <ManilaSkylineOutline height={32} opacity={0.92} glow={true} showSeal={true} />
-      </div>
+      {/* Minimal Theme & Full-App Bar when Blank Everything Focus Mode is active on Project Tab */}
+      {isProjectBlankFocus && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px',
+            padding: '8px 18px',
+            background: 'var(--bg-header)',
+            borderBottom: '1px solid var(--glass-border)',
+            backdropFilter: 'blur(14px)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <span
+              style={{
+                padding: '3px 9px',
+                borderRadius: '999px',
+                fontSize: '10px',
+                fontWeight: 800,
+                letterSpacing: '0.07em',
+                textTransform: 'uppercase',
+                background: 'rgba(16, 185, 129, 0.16)',
+                border: '1px solid rgba(16, 185, 129, 0.45)',
+                color: '#6ee7b7',
+              }}
+            >
+              BLANK DISTRACTIONS MODE ACTIVE
+            </span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+              Automated Problem-Solver Project – Design Your Custom Workflow (4 Sets • 11 Items • 250 Total Score)
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <ThemeSwitcher
+              themeId={themeId}
+              onThemeChange={(nextId) => setThemeId(nextId)}
+              showToast={showToast}
+            />
+            <button
+              type="button"
+              onClick={() => setBlankSurroundingChrome(false)}
+              className={styles.secondaryBtn}
+              style={{ padding: '6px 11px', fontSize: '11px', fontWeight: 700 }}
+            >
+              Show Full Navigation Header
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Official City of Manila Architectural Skyline Header Strip (Hidden in Project Blank Focus Mode) */}
+      {!isProjectBlankFocus && (
+        <div style={{ width: '100%', borderBottom: '1px solid var(--glass-border)', background: 'transparent' }}>
+          <ManilaSkylineOutline height={32} opacity={0.92} glow={true} showSeal={true} />
+        </div>
+      )}
 
       {/* Dedicated Top Bar with Active User Profile Information & Switcher */}
-      <UserProfileTopBar
-        userProfile={userProfile}
-        onUpdateProfile={handleUpdateUserProfile}
-        firebaseUser={user}
-        showToast={showToast}
-      />
+      {!isProjectBlankFocus && (
+        <UserProfileTopBar
+          userProfile={userProfile}
+          onUpdateProfile={handleUpdateUserProfile}
+          firebaseUser={user}
+          showToast={showToast}
+        />
+      )}
 
       {/* Persistent Command Center Top Bar */}
+      {!isProjectBlankFocus && (
       <header className={styles.topCommandHeader}>
         <div className={styles.brandCluster}>
           <div className={styles.sealGroup}>
@@ -583,6 +635,7 @@ export default function App({ initialRouteTab = 'command' }) {
           </button>
         </nav>
       </header>
+      )}
 
       {/* Non-intrusive Toast Notification */}
       {toast && (
@@ -721,7 +774,18 @@ export default function App({ initialRouteTab = 'command' }) {
         {activeTab === 'project' && (
           <AutomatedProblemSolverProjectView
             showToast={showToast}
-            onNavigateTab={(tab) => handleSelectNavTab(tab)}
+            onNavigateToFlowchart={() => {
+              setBlankSurroundingChrome(false);
+              handleSelectNavTab('flowchart');
+            }}
+            onNavigateToTracker={() => {
+              setBlankSurroundingChrome(false);
+              handleSelectNavTab('tracker');
+            }}
+            blankSurroundingChrome={blankSurroundingChrome}
+            onToggleBlankSurroundingChrome={() =>
+              setBlankSurroundingChrome((prev) => !prev)
+            }
           />
         )}
       </main>
@@ -818,6 +882,7 @@ export default function App({ initialRouteTab = 'command' }) {
       )}
 
       {/* Mobile Fixed Bottom Navigation Bar (Thumb Friendly) */}
+      {!isProjectBlankFocus && (
       <nav className={styles.mobileBottomNav} aria-label="Mobile Navigation Bar">
         <button
           type="button"
@@ -867,6 +932,7 @@ export default function App({ initialRouteTab = 'command' }) {
           <span>More</span>
         </button>
       </nav>
+      )}
     </div>
   );
 }

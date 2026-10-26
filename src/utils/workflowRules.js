@@ -2467,6 +2467,7 @@ export function validatePinnedDecloggingSite(input = {}) {
  */
 export const AUTOMATED_PROBLEM_SOLVER_PROJECT = {
   title: 'Automated Problem-Solver Project – Design Your Custom Workflow',
+  courseTitle: 'Course: Implement Basic Automation Techniques Using AI Tools',
   totalSets: 4,
   totalItems: 11,
   totalScore: 250,
@@ -2486,179 +2487,196 @@ export const AUTOMATED_PROBLEM_SOLVER_PROJECT = {
     {
       setNumber: 1,
       setId: 'SET-1',
-      title: 'Set 1: Problem Identification & Repetitive Bottleneck Analysis',
-      subtitle: 'Identify the specific, repetitive manual problem and quantify the time and effort saved.',
-      maxPoints: 60,
+      title: 'Set 1: Define Your Problem (The "What" & "Why")',
+      subtitle:
+        'Define the repetitive problem, the trigger (the start), and the goal (end) of your automated workflow.',
+      maxPoints: 30,
       items: [
         {
           itemNumber: 1,
           itemId: 'ITEM-1',
           setNumber: 1,
-          title: 'Define the Specific, Repetitive Problem',
+          questionNumberInSet: 1,
+          title: '1. The Repetitive Problem (What problem are you solving?) *',
           prompt:
-            'What repetitive manual problem does your custom workflow solve, and who is affected by it?',
-          maxPoints: 20,
+            'Describe the specific, repetitive manual problem your custom workflow solves and why it wastes time and effort.',
+          maxPoints: 10,
           workflow1Default:
-            'Barangay officials across Manila’s 16 administrative districts repeatedly submit drainage declogging and desilting requests via paper letters, walk-in notes, and scattered chat messages. Liaison staff manually re-type details, leading to lost requests, missing street landmarks, and duplicate crew dispatches.',
+            'Barangay officials across Manila’s 16 administrative districts repeatedly submit drainage declogging and desilting requests via paper letters, walk-in notes, and chat messages. Staff manually re-type details into spreadsheets, manually check if all 6 required engineering fields are complete, look up district boundaries by hand, and type repetitive status updates—leading to 25–40 minutes wasted per request, lost tickets, and duplicate crew dispatches.',
           workflow2Default:
-            'Field inspectors manually record estero and culvert water quality readings (Dissolved Oxygen, H2S gas, Turbidity, Ammonia, Flow Index) on paper clipboards across 8 drainage zones, delaying hazardous H2S gas alerts and emergency desilting prioritization.',
+            'Field inspectors manually record estero and culvert water quality readings (Dissolved Oxygen, H2S gas, Turbidity, Ammonia, and Hydraulic Flow Efficiency) on paper clipboards across 8 drainage zones and manually compare each reading against safety tables, delaying critical confined-space H2S gas hazard alerts.',
         },
         {
           itemNumber: 2,
           itemId: 'ITEM-2',
           setNumber: 1,
-          title: 'Analyze Manual Bottlenecks (Time & Effort Wasted)',
+          questionNumberInSet: 2,
+          title: '2. The trigger (the start) *',
           prompt:
-            'Which repetitive steps in the current manual process consume the most time and effort or cause frequent errors?',
-          maxPoints: 20,
+            'The trigger (the start) * — What specific event automatically starts your workflow? (10 Points • Essay)',
+          maxPoints: 10,
           workflow1Default:
-            '1) Manually verifying whether a request includes all 6 mandatory engineering details (taking 25–40 mins per letter). 2) Cross-checking spreadsheets for duplicate active tickets on the same street. 3) Manually looking up Manila Administrative & Legislative districts from street corners. 4) Writing repetitive bilingual status update letters.',
+            'The workflow is triggered automatically the moment a Barangay official or DEPW Liaison Officer submits a new Declogging Request Form in the Smart Tracker OR drops a location pin on the interactive React-Leaflet Manila GIS Map. This single intake event immediately initiates automated 6-point completeness validation, privacy/PII sanitization, and spatial district detection without any manual spreadsheet entry.',
           workflow2Default:
-            '1) Manually comparing 5 chemical/hydraulic parameters against DEPW safety thresholds for every sample. 2) Calling supervisors when confined-space H2S gas exceeds 5.0 ppm (Warning) or 10.0 ppm (Critical). 3) Aggregating zone logs into district compliance summaries.',
+            'The workflow is triggered automatically when a DEPW Field Inspector selects one of the 8 Identified Manila Drainage Zones and submits a digital Water Quality Parameter Log entry (Dissolved Oxygen, H2S gas ppm, Turbidity NTU, Ammonia mg/L, and Flow Efficiency %).',
         },
         {
           itemNumber: 3,
           itemId: 'ITEM-3',
           setNumber: 1,
-          title: 'Measurable Project Goal (Time & Effort Saved)',
+          questionNumberInSet: 3,
+          title: '3. The goal (end) *',
           prompt:
-            'What measurable improvement in speed, accuracy, and effort reduction does your automated workflow achieve?',
-          maxPoints: 20,
+            'The goal (end) * — What is the final end-state and measurable outcome once the workflow finishes? (10 Points • Essay)',
+          maxPoints: 10,
           workflow1Default:
-            'Reduces average request resolution turnaround by 35.4% (from 4.8 days to 3.1 days), cuts intake verification time from 30 minutes to under 45 seconds per ticket, eliminates unverified/duplicate dispatches, and maintains a 100% immutable audit trail.',
+            'The goal (end) is a fully verified, geo-pinned, and uniquely numbered service ticket (e.g., DEO-2026-NNN) routed to the exact Manila Engineering District with an AI-drafted bilingual (Filipino/English) official endorsement letter, scheduled crew dispatch, signed barangay closure, and a tamper-evident audit log—cutting intake verification from 30 minutes to under 45 seconds and reducing overall turnaround time by 35.4%.',
           workflow2Default:
-            'Reduces water quality hazard classification time from 20 minutes to instant (< 1 second) automated evaluation, achieves 92.4% drainage zone telemetry compliance, and prevents confined-space crew entry whenever H2S >= 10.0 ppm.',
+            'The goal (end) is an instantaneously classified drainage zone safety record (NORMAL, WARNING, or CRITICAL) persisted to the central dashboard with automated H2S confined-space evacuation/ventilation alerts and prioritized desilting dispatch in under 1 second.',
         },
       ],
     },
     {
       setNumber: 2,
       setId: 'SET-2',
-      title: 'Set 2: Workflow Triggers, Structured Inputs & Privacy Guardrails',
-      subtitle: 'Specify how the workflow starts, what data it collects, and how Data Minimization & Consent are enforced.',
-      maxPoints: 60,
+      title: 'Set 2: Design Your Workflow (The "How")',
+      subtitle:
+        'Upload your visual Flowchart (50 Points) and your complete step-by-step Workflow architecture (50 Points).',
+      maxPoints: 100,
       items: [
         {
           itemNumber: 4,
           itemId: 'ITEM-4',
           setNumber: 2,
-          title: 'Automated Trigger Event & Entry Channel',
+          questionNumberInSet: 1,
+          title: '1. Upload your Flowchart here * (50 Points • File Upload)',
           prompt:
-            'What specific event triggers the automated workflow to start?',
-          maxPoints: 20,
+            'Upload your Flowchart here * — Visual 8-Stage Step-by-Step Flowchart showing Start Trigger, Decision Diamonds, Automated Actions, and End Goal (50 Points).',
+          maxPoints: 50,
           workflow1Default:
-            'Trigger: A Barangay official or DEPW Liaison Officer submits a new Declogging Request form in the Smart Tracker OR clicks on the React-Leaflet Manila GIS Map to pin a clogged drainage site.',
+            '[START TRIGGER: Barangay Submits Request / Pins GIS Map] ➔ [STEP 01 INTAKE: Auto-Stamp & Privacy Consent Check] ➔ [STEP 02 VERIFY (Decision Diamond): Are all 6 Required Engineering Fields Complete?] —(If NO)➔ [Auto-Route to "Returned for Clarification" + Draft Missing-Info Notice] / —(If YES)➔ [STEP 03 REGISTER: Auto-Assign DEO-2026-NNN ID + Point-in-Polygon Manila District Detection + Duplicate Check] ➔ [STEP 04 ENDORSE: AI Generates Bilingual Technical Endorsement Memo] ➔ [STEP 05 INSPECT: Log Silt Depth & H2S Gas Safety Check (<3.0 ppm)] ➔ [STEP 06 SCHEDULE: Assign Jet-Vac Truck & Crew Slot] ➔ [STEP 07 IMPLEMENT: Track Field Declogging & Debris Hauling] ➔ [STEP 08 CLOSE (END GOAL): Barangay Sign-Off + Lock Immutable Audit Log].',
           workflow2Default:
-            'Trigger: A DEPW Field Inspector selects one of the 8 Identified Drainage Zones and submits a Water Quality Parameter Log entry (DO, H2S, Turbidity, NH3, Flow Efficiency, pH).',
+            '[START TRIGGER: Inspector Submits Zone Water Quality Log] ➔ [STEP 01 VALIDATE: Check Numeric Ranges & Strip/Redact Any PII] ➔ [STEP 02 ZONE LINK: Attach Manila Estero & District Coordinates] ➔ [STEP 03 THRESHOLD ENGINE (Decision Diamond): Evaluate DO, H2S, Turbidity, NH3, Flow] —(H2S >= 10 ppm or DO <= 3 mg/L)➔ [CRITICAL ALERT: Block Culvert Entry + Dispatch Forced Ventilation] / —(H2S >= 5 ppm)➔ [WARNING ALERT: Schedule Priority Desilting] / —(All Safe)➔ [NORMAL STATUS: Archive Telemetry & Sync Live Dashboard (END GOAL)].',
         },
         {
           itemNumber: 5,
           itemId: 'ITEM-5',
           setNumber: 2,
-          title: 'Required Structured Inputs & Validation Rules',
+          questionNumberInSet: 2,
+          title: '2. Upload your Workflow here * (50 Points • File Upload)',
           prompt:
-            'What exact inputs are validated automatically before the workflow proceeds to the next stage?',
-          maxPoints: 20,
+            'Upload your Workflow here * — Complete step-by-step automated workflow implementation specification: Inputs, Data Privacy Guardrails, Automated Rules, AI Step, and Outputs (50 Points).',
+          maxPoints: 50,
           workflow1Default:
-            '6-Point Automated Completeness Check: (1) Barangay Name, (2) Manila District & Legislative District, (3) Exact Street/Canal Segment (>= 5 chars), (4) Coordinating Official Name & Role, (5) Obstruction Description (>= 15 chars), and (6) Verified Manila GPS Coordinates.',
+            'COMPLETE AUTOMATED WORKFLOW SPECIFICATION (8 STAGES):\n• Trigger: Form submission or interactive React-Leaflet map pin.\n• Automated Input Validation: Verifies Barangay, Manila District, Street/Landmark (>=5 chars), Official Contact, Obstruction Description (>=15 chars), and GPS Coordinates.\n• Data Privacy & Protection Guardrail: Displays explicit DEPW Consent Notice, enforces Data Minimization (strips birthdates, TIN/SSS/GSIS IDs, financial details, passwords), and masks accidental PII as [REDACTED SENSITIVE PII].\n• Spatial & Rule Automation: Point-in-polygon algorithm auto-detects the exact Manila District & nearest Estero; scans active queue for street-level duplicates; enforces valid state-machine transitions.\n• AI Enhancement Step: Summarizes unstructured citizen/barangay descriptions, classifies urgency, and drafts formal Filipino/English transmittal letters for human engineer approval.\n• Final Output: Persistent SQLite/LocalStorage ticket record, live KPI metrics update, and immutable field-level diff audit trail.',
           workflow2Default:
-            'Automated Parameter Validation: Verifies valid Drainage Zone ID, numeric Dissolved Oxygen (0–20 mg/L), H2S Culvert Gas (0–100 ppm), Suspended Turbidity (0–1000 NTU), Ammonia (0–50 mg/L), Hydraulic Flow Efficiency (0–100%), pH (0–14), and Inspector Name.',
-        },
-        {
-          itemNumber: 6,
-          itemId: 'ITEM-6',
-          setNumber: 2,
-          title: 'Data Privacy, Minimization & Explicit Consent Guardrail',
-          prompt:
-            'How does the workflow protect user privacy, minimize data collection, and prevent sensitive PII disclosure?',
-          maxPoints: 20,
-          workflow1Default:
-            'Enforces DEPW Data Privacy Guidelines: (1) Purpose Limitation & Data Minimization: strips disallowed fields (birthdates, TIN/SSS/GSIS IDs, financial accounts, passwords, private home addresses). (2) Requires Explicit Consent Notice before logging contact details. (3) Automatically masks accidental sensitive identifiers as [REDACTED SENSITIVE PII] so they are never echoed or stored.',
-          workflow2Default:
-            'Collects only official inspector designation and public waterway telemetry coordinates. Automatically redacts any accidentally pasted personal IDs, passwords, or private resident information from field observation notes.',
+            'COMPLETE WATER QUALITY & H2S SAFETY WORKFLOW SPECIFICATION:\n• Trigger: Inspector logs parameters for any of the 8 Manila Drainage Zones.\n• Automated Validation: Verifies numeric bounds for DO (0–25 mg/L), H2S (0–200 ppm), Turbidity (0–1000 NTU), Ammonia (0–100 mg/L), and Flow Index (0–100%).\n• Automated Classification Engine: Evaluates parameters against WATER_DRAINAGE_THRESHOLDS in <1ms and assigns NORMAL, WARNING, or CRITICAL status.\n• AI & Safety Output: Generates explainable bilingual field safety advisories and updates Command Center hazard banners.',
         },
       ],
     },
     {
       setNumber: 3,
       setId: 'SET-3',
-      title: 'Set 3: Step-by-Step Automated Processing Pipeline',
-      subtitle: 'Design the sequential automated actions, decision branches, and routing logic.',
-      maxPoints: 80,
+      title: 'Set 3: Final Review (The "So What")',
+      subtitle:
+        'Answer the two 35-point Final Review essay questions: AI/Automation Enhancement and Weekly Time/Effort Saved.',
+      maxPoints: 70,
       items: [
+        {
+          itemNumber: 6,
+          itemId: 'ITEM-6',
+          setNumber: 3,
+          questionNumberInSet: 1,
+          title:
+            '1. AI/Automation Enhancement: Which part of your workflow can be improved by AI, and how does AI make this step better compared to a simple rule-based automation? * (35 Points)',
+          prompt:
+            'AI/Automation Enhancement: Which part of your workflow can be improved by AI, and how does AI make this step better compared to a simple rule-based automation? * (35 Points • Essay)',
+          maxPoints: 35,
+          workflow1Default:
+            'The parts of our workflow improved by AI are Stage 02 (Unstructured Request Triage & Urgency Classification), Stage 04 (Engineering Evaluation Summary), and Stage 06 (Bilingual Official Letter & Barangay Liaison Drafting).\n\nHow AI makes this step better compared to simple rule-based automation:\n1) Understanding Unstructured Natural Language (Taglish/Filipino/English): Simple rule-based automation only checks rigid IF/THEN conditions (e.g., checking if a text box has >= 15 characters or matching exact keywords). However, barangay officials describe drainage issues in varied, unstructured ways (e.g., "halos tuhod na ang baha tuwing ulan at may amoy gas sa imburnal malapit sa paaralan"). AI comprehends context, extracts the root hazard (severe siltation + potential H2S gas near a school zone), and recommends priority escalation even when exact trigger keywords are absent.\n2) Semantic Duplicate & Spatial Context Synthesis: While rules only match identical street strings, AI recognizes that two differently phrased reports along connected estero laterals refer to the same underlying culvert blockage.\n3) Context-Aware Bilingual Drafting with Human-in-the-Loop: Instead of rigid fill-in-the-blank templates, AI drafts polite, context-specific Filipino and English endorsement memos and action plans tailored to the exact obstruction, while keeping a human engineer in the loop to review and approve before sending.',
+          workflow2Default:
+            'In Workflow 2 (Drainage Zone Water Quality & H2S Safety), AI enhances multi-parameter environmental diagnostics and remediation planning.\n\nWhile simple rule-based automation only flags static threshold breaches (e.g., IF H2S >= 10 ppm THEN status = CRITICAL), AI analyzes the combined interaction across all 5 parameters (low Dissolved Oxygen + rising Ammonia + high Turbidity + H2S buildup) alongside local tidal and estero geography to diagnose the probable physical cause (e.g., organic market grease trap stagnation vs. tidal backflow) and generates tailored crew safety and biological remediation instructions.',
+        },
         {
           itemNumber: 7,
           itemId: 'ITEM-7',
           setNumber: 3,
-          title: 'Step-by-Step Automation Phase A: Spatial & Intake Intelligence',
+          questionNumberInSet: 2,
+          title:
+            '2. Time/Effort Saved: How much time or effort would this automated workflow save you per week? (Estimate in minutes or hours). * (35 Points)',
           prompt:
-            'Describe the first set of automated actions executed immediately after input validation.',
-          maxPoints: 25,
+            'Time/Effort Saved: How much time or effort would this automated workflow save you per week? (Estimate in minutes or hours). * (35 Points • Essay)',
+          maxPoints: 35,
           workflow1Default:
-            'Step 01 (Receive) → Step 02 (Verify) → Step 03 (Register): Point-in-polygon GIS engine automatically detects the Manila District, Legislative District, and nearest Estero from the pinned coordinates, assigns a unique DEO-2026-NNN ID, computes the 0–100% completeness score, and scans active tickets to flag potential duplicates.',
+            'Estimated Weekly Time Saved: Approximately 18.5 to 22.5 hours per week (1,110 to 1,350 minutes per week) for a standard liaison and engineering intake team handling ~45 barangay declogging requests per week.\n\nStep-by-Step Weekly Time Savings Breakdown (per request × 45 requests/week):\n1) Intake Encoding & 6-Point Completeness Verification: Manual process takes ~12 mins/request; Automated validation takes <1 min (Saves ~11 mins × 45 = 495 mins / 8.25 hours per week).\n2) GIS District Lookup & Duplicate Cross-Checking: Manual map/spreadsheet lookup takes ~8 mins/request; Automated React-Leaflet Point-in-Polygon & duplicate scan takes <5 seconds (Saves ~8 mins × 45 = 360 mins / 6.0 hours per week).\n3) Drafting Bilingual Barangay Updates & Endorsement Memos: Manually typing formal Filipino/English letters takes ~10 mins/request; AI-assisted drafting takes ~1 min for human review (Saves ~9 mins × 45 = 405 mins / 6.75 hours per week).\n4) Status Tracking & Audit Log Compilation: Saves ~90 mins (1.5 hours) per week of manual Friday report consolidation.\n\nTotal Impact: Saves ~28 minutes per request, totaling ~1,350 minutes (22.5 hours) per week—eliminating repetitive clerical fatigue, preventing lost or duplicate dispatches, and accelerating overall drainage resolution turnaround by 35.4%.',
           workflow2Default:
-            'Step 01 (Zone Lookup) → Step 02 (Parameter Normalization): Automatically links the submitted reading to the canonical Manila Drainage Zone metadata (district, receiving waterway, benchmark coordinates) and normalizes all numeric sensor values.',
-        },
-        {
-          itemNumber: 8,
-          itemId: 'ITEM-8',
-          setNumber: 3,
-          title: 'Step-by-Step Automation Phase B: Decision Branching & Routing Rules',
-          prompt:
-            'How does the workflow automatically route items or generate outputs based on conditional rules?',
-          maxPoints: 30,
-          workflow1Default:
-            'Step 04 (Endorse) → Step 05 (Inspect) → Step 06 (Schedule): Enforces state-machine transition rules (canTransitionStatus). If completeness < 100%, routes to "Returned for Clarification"; if complete, routes to "Pending Evaluation" → "Inspection Scheduled", generates explainable next-step recommendations, and drafts a bilingual Filipino/English liaison memo.',
-          workflow2Default:
-            'Step 03 (Threshold Engine) → Step 04 (Hazard Classification): Evaluates each metric against WATER_DRAINAGE_THRESHOLDS. Classifies overall status as NORMAL (Green), WARNING (Amber: e.g., H2S >= 5 ppm or DO <= 5 mg/L), or CRITICAL (Red: e.g., H2S >= 10 ppm or DO <= 3 mg/L) and triggers automated crew ventilation/desilting advisories.',
-        },
-        {
-          itemNumber: 9,
-          itemId: 'ITEM-9',
-          setNumber: 3,
-          title: 'Step-by-Step Automation Phase C: Execution Tracking & Audit Persistence',
-          prompt:
-            'How are updates persisted, tracked, and synchronized across the system?',
-          maxPoints: 25,
-          workflow1Default:
-            'Step 07 (Implement) → Step 08 (Close): Every status transition, coordinate verification, or checklist toggle automatically computes field-level diffs (computeTicketAuditDiff), writes an immutable audit log entry to SQLite/LocalStorage, updates live Command Center KPIs, and locks "Closed" tickets against unauthorized edits.',
-          workflow2Default:
-            'Step 05 (Persistence & Dashboard Sync): Saves the classified water quality log with timestamp and breach breakdown to SQLite/LocalStorage, updates zone health badges on the Command Center and Water Quality Logger, and enables 1-click filtering by Zone, District, and Hazard Status.',
+            'For Workflow 2 (Drainage Zone Water Quality & H2S Safety Telemetry across 8 zones logged 3 times/week = 24 zone assessments/week): Manual threshold lookup, hazard calculation, and safety memo writing take ~20 minutes per log (480 mins/week). The automated threshold engine evaluates all 5 parameters in under 1 second (<1 min/log), saving ~19 minutes per log or ~456 minutes (7.6 hours) per week—Bringing combined dual-workflow savings to ~30.1 hours (1,806 minutes) per week.',
         },
       ],
     },
     {
       setNumber: 4,
       setId: 'SET-4',
-      title: 'Set 4: Exception Handling, Human-in-the-Loop & Final Evaluation',
-      subtitle: 'Ensure safety, accountability, and verifiable quality across all edge cases.',
+      title: 'Set 4: Presentation Slides & Operational Verification',
+      subtitle:
+        'Present and attach your Fully Animated PPT Presentation Deck, Data Privacy Compliance, and Group Verification (50 Points).',
       maxPoints: 50,
       items: [
+        {
+          itemNumber: 8,
+          itemId: 'ITEM-8',
+          setNumber: 4,
+          questionNumberInSet: 1,
+          title: '1. Presentation Slides — Problem, Trigger & Goal Overview (15 Points)',
+          prompt:
+            'Slide Deck Part 1: Executive Summary of the Repetitive Problem, Automated Trigger, and Measurable End Goal.',
+          maxPoints: 15,
+          workflow1Default:
+            'Slides 01–03 of the Animated PPT Deck present the Executive Title, Team Roster, Manual Declogging Bottlenecks (25–40 mins wasted per paper request), the Instant Intake Trigger (Form + GIS Map Pin), and the End Goal (35.4% faster turnaround and 22.5 hours saved per week).',
+          workflow2Default:
+            'Includes dual-workflow slides covering the 8 Manila Drainage Zones, automated 5-parameter chemical/hydraulic intake trigger, and instant H2S confined-space hazard classification.',
+        },
+        {
+          itemNumber: 9,
+          itemId: 'ITEM-9',
+          setNumber: 4,
+          questionNumberInSet: 2,
+          title: '2. Presentation Slides — Visual Flowchart & 8-Stage Architecture (15 Points)',
+          prompt:
+            'Slide Deck Part 2: Visual Walkthrough of the 8-Stage Automated Pipeline, Decision Branches, and GIS Pinning.',
+          maxPoints: 15,
+          workflow1Default:
+            'Slides 04–06 animate the 8-Stage Pipeline (01 Receive ➔ 02 Verify ➔ 03 Register ➔ 04 Endorse ➔ 05 Inspect ➔ 06 Schedule ➔ 07 Implement ➔ 08 Close), illustrating the 6-point completeness gate, point-in-polygon Manila District detection, and state-machine routing.',
+          workflow2Default:
+            'Animates the multi-parameter water quality decision tree: Normal (Green) vs. Warning (Amber: H2S >= 5 ppm) vs. Critical Evacuation (Red: H2S >= 10 ppm or DO <= 3 mg/L).',
+        },
         {
           itemNumber: 10,
           itemId: 'ITEM-10',
           setNumber: 4,
-          title: 'Exception Handling & Human-in-the-Loop Safeguards',
+          questionNumberInSet: 3,
+          title: '3. Presentation Slides — Data Privacy, Consent & PII Guardrails (10 Points)',
           prompt:
-            'What happens when inputs are incomplete, an API is offline, or a high-risk decision is required?',
-          maxPoints: 25,
+            'Slide Deck Part 3: How Purpose Limitation, Data Minimization, Explicit Consent, and PII Masking are enforced.',
+          maxPoints: 10,
           workflow1Default:
-            '1) Human-in-the-Loop: AI-generated drafts and explainable next steps require human engineer confirmation before dispatch or Gmail draft creation. 2) Dual-Mode Resilience: Automatically falls back to deterministic local rules and LocalStorage persistence when hosted on static GitHub Pages or offline. 3) Blocks invalid workflow jumps (e.g., jumping straight from For Verification to Closed).',
+            'Slide 07 demonstrates our strict compliance with DEPW Data Privacy Guidelines: displaying the mandatory Explicit Consent Notice before logging contact details, stripping disallowed fields (birthdates, TIN/SSS/GSIS IDs, financial data, passwords), and automatically redacting accidental PII as [REDACTED SENSITIVE PII].',
           workflow2Default:
-            '1) Confined-Space Safety Gate: Critical H2S readings (>= 10 ppm) trigger an immediate mandatory evacuation banner before any crew enters a culvert. 2) Rejects out-of-range or non-numeric sensor inputs with clear field-level error messages.',
+            'Ensures field telemetry logs store only official inspector designations and public waterway coordinates while redacting any sensitive personal identifiers.',
         },
         {
           itemNumber: 11,
           itemId: 'ITEM-11',
           setNumber: 4,
-          title: 'End-to-End Verification & Operational Impact Summary',
+          questionNumberInSet: 4,
+          title: '4. Presentation Slides — AI vs. Rules & Weekly Time Saved Conclusion (10 Points)',
           prompt:
-            'How have you verified that the complete step-by-step workflow solves the problem from start to finish?',
-          maxPoints: 25,
+            'Slide Deck Part 4: Final Review ("The So What") synthesis comparing AI vs. Rule-Based Automation and quantifying weekly hours saved.',
+          maxPoints: 10,
           workflow1Default:
-            'Verified across all 8 workflow stages (01 Receive to 08 Close) with automated unit tests, interactive flowchart simulation, React-Leaflet district map pinning, PII redaction checks, and CSV export—saving 35.4% turnaround time while ensuring full public service accountability.',
+            'Slides 08–10 present the Final Review ("The So What") comparison table (Rule-Based IF/THEN checks vs. Context-Aware AI Triage & Bilingual Drafting with Human-in-the-Loop) and the verified 22.5 hours/week (1,350 mins/week) time-savings scorecard achieving 250 / 250 Total Score.',
           workflow2Default:
-            'Verified across all 8 Manila drainage zones with automated threshold unit tests (NORMAL, WARNING, CRITICAL), live parameter logging, instant status filtering, and bilingual safety guidance.',
+            'Summarizes combined dual-workflow impact (30.1 hours/week saved across declogging intake and water quality telemetry) with downloadable .PPT and Animated HTML5 presentation files ready for submission.',
         },
       ],
     },

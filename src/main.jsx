@@ -2,24 +2,24 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
+import { applyThemeVariablesToRoot, resolveValidThemeId } from './utils/themeConfig.js';
 import './index.css';
 
 if (typeof window !== 'undefined') {
   window.__DEPW_APP_MOUNTED__ = true;
 }
 
-// Initialize persisted theme immediately on document root before React hydration
+// Initialize persisted theme and CSS custom properties immediately on document root before React hydration
 try {
-  const savedTheme =
+  const savedTheme = resolveValidThemeId(
     localStorage.getItem('depw_theme_id') ||
-    localStorage.getItem('theme') ||
-    'navy-glass';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-  if (document.body) {
-    document.body.setAttribute('data-theme', savedTheme);
-  }
+      localStorage.getItem('theme') ||
+      'navy-glass'
+  );
+  applyThemeVariablesToRoot(savedTheme, document);
 } catch {
-  document.documentElement.setAttribute('data-theme', 'navy-glass');
+  applyThemeVariablesToRoot('navy-glass', document);
 }
 
 class RootErrorBoundary extends React.Component {
@@ -93,22 +93,24 @@ if (rootElement && (typeof window === 'undefined' || !window.__DEPW_ROOT_RENDERE
   createRoot(rootElement).render(
     <React.StrictMode>
       <RootErrorBoundary>
-        <HashRouter>
-          <Routes>
-            <Route path="/" element={<App initialRouteTab="command" />} />
-            <Route path="/command" element={<App initialRouteTab="command" />} />
-            <Route path="/tracker" element={<App initialRouteTab="tracker" />} />
-            <Route path="/flowchart" element={<App initialRouteTab="flowchart" />} />
-            <Route path="/waterlog" element={<App initialRouteTab="waterlog" />} />
-            <Route path="/project" element={<App initialRouteTab="project" />} />
-            <Route path="/map" element={<App initialRouteTab="map" />} />
-            <Route path="/presentation" element={<App initialRouteTab="presentation" />} />
-            <Route path="/3d" element={<App initialRouteTab="3d" />} />
-            <Route path="/ai" element={<App initialRouteTab="ai" />} />
-            <Route path="/bioscience" element={<App initialRouteTab="bioscience" />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </HashRouter>
+        <ThemeProvider>
+          <HashRouter>
+            <Routes>
+              <Route path="/" element={<App initialRouteTab="command" />} />
+              <Route path="/command" element={<App initialRouteTab="command" />} />
+              <Route path="/tracker" element={<App initialRouteTab="tracker" />} />
+              <Route path="/flowchart" element={<App initialRouteTab="flowchart" />} />
+              <Route path="/waterlog" element={<App initialRouteTab="waterlog" />} />
+              <Route path="/project" element={<App initialRouteTab="project" />} />
+              <Route path="/map" element={<App initialRouteTab="map" />} />
+              <Route path="/presentation" element={<App initialRouteTab="presentation" />} />
+              <Route path="/3d" element={<App initialRouteTab="3d" />} />
+              <Route path="/ai" element={<App initialRouteTab="ai" />} />
+              <Route path="/bioscience" element={<App initialRouteTab="bioscience" />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </HashRouter>
+        </ThemeProvider>
       </RootErrorBoundary>
     </React.StrictMode>
   );
