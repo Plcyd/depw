@@ -39,7 +39,8 @@ import AiLiaisonHubView from './components/AiLiaisonHubView.jsx';
 import BioscienceLabView from './components/BioscienceLabView.jsx';
 import WaterQualityZoneLogger from './components/WaterQualityZoneLogger.jsx';
 import ThemeSwitcher from './components/ThemeSwitcher.jsx';
-import SimpleGuideModal from './components/SimpleGuideModal.jsx';
+import UserProfileTopBar from './components/UserProfileTopBar.jsx';
+import { DEPW_OFFICER_PROFILES } from './utils/workflowRules.js';
 import { api } from './services/api.js';
 import { initAuth, googleSignIn, logout } from './services/firebaseClient.js';
 
@@ -56,7 +57,20 @@ export default function App({ initialRouteTab = 'command' }) {
       return true;
     }
   });
-  const [titaNerryGuideOpen, setTitaNerryGuideOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState(() => {
+    try {
+      const saved = localStorage.getItem('depw_user_profile');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.fullName && parsed.badgeId) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore storage errors
+    }
+    return DEPW_OFFICER_PROFILES[0];
+  });
 
   const [themeId, setThemeId] = useState(() => {
     try {
@@ -156,6 +170,15 @@ export default function App({ initialRouteTab = 'command' }) {
       // ignore
     }
   }, [simpleNavMode]);
+
+  const handleUpdateUserProfile = useCallback((nextProfile) => {
+    setUserProfile(nextProfile);
+    try {
+      localStorage.setItem('depw_user_profile', JSON.stringify(nextProfile));
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -351,6 +374,14 @@ export default function App({ initialRouteTab = 'command' }) {
         <ManilaSkylineOutline height={32} opacity={0.92} glow={true} showSeal={true} />
       </div>
 
+      {/* Dedicated Top Bar with Active User Profile Information & Switcher */}
+      <UserProfileTopBar
+        userProfile={userProfile}
+        onUpdateProfile={handleUpdateUserProfile}
+        firebaseUser={user}
+        showToast={showToast}
+      />
+
       {/* Persistent Command Center Top Bar */}
       <header className={styles.topCommandHeader}>
         <div className={styles.brandCluster}>
@@ -359,16 +390,34 @@ export default function App({ initialRouteTab = 'command' }) {
               src="./assets/aistudio/image_5aec6efb.png"
               alt="City of Manila Official Seal"
               className={styles.headerSealImg}
+              onError={(e) => {
+                if (!e.currentTarget.dataset.retried) {
+                  e.currentTarget.dataset.retried = '1';
+                  e.currentTarget.src = './public/assets/aistudio/image_5aec6efb.png';
+                }
+              }}
             />
             <img
               src="./assets/aistudio/image_81ca72a0.png"
               alt="Department of Engineering and Public Works Seal"
               className={styles.headerSealImg}
+              onError={(e) => {
+                if (!e.currentTarget.dataset.retried) {
+                  e.currentTarget.dataset.retried = '1';
+                  e.currentTarget.src = './public/assets/aistudio/image_81ca72a0.png';
+                }
+              }}
             />
             <img
               src="./assets/aistudio/image_79da53c5.png"
               alt="Philippine Transparency Seal"
               className={styles.headerSealImg}
+              onError={(e) => {
+                if (!e.currentTarget.dataset.retried) {
+                  e.currentTarget.dataset.retried = '1';
+                  e.currentTarget.src = './public/assets/aistudio/image_79da53c5.png';
+                }
+              }}
             />
           </div>
           <div>
@@ -386,19 +435,8 @@ export default function App({ initialRouteTab = 'command' }) {
           </div>
         </div>
 
-        {/* Right Actions: Tita Nerry Guide (.TXT) + Tutorial + Journey Replay + Settings + ThemeSwitcher + Auth */}
+        {/* Right Actions: Tutorial + Journey Replay + Settings + ThemeSwitcher + Auth */}
         <div className={styles.headerRightActions}>
-          {/* Tita Nerry Simple How-To Guide (.TXT) */}
-          <button
-            type="button"
-            onClick={() => setTitaNerryGuideOpen(true)}
-            className={styles.secondaryBtn}
-            style={{ padding: '7px 11px', fontSize: '12px' }}
-            title="Gabay para kay Tita Nerry (HOW_TO_USE_FOR_TITA_NERRY.txt)"
-          >
-            <FileText size={14} className="text-amber-400" />
-            <span>Tita Nerry Guide (.TXT)</span>
-          </button>
 
           {/* Step-by-Step Guide / Replay Tutorial Modal Button */}
           <button
@@ -586,7 +624,6 @@ export default function App({ initialRouteTab = 'command' }) {
               setJourneyReplayTicketId(ticketId || focusedTrackerTicketId);
             }}
             onOpenTutorial={() => setTutorialOpen(true)}
-            onOpenTitaNerryGuide={() => setTitaNerryGuideOpen(true)}
             onNavigateTab={(tab) => handleSelectNavTab(tab)}
             showToast={showToast}
           />
@@ -674,19 +711,6 @@ export default function App({ initialRouteTab = 'command' }) {
 
         {activeTab === 'waterlog' && <WaterQualityZoneLogger showToast={showToast} />}
       </main>
-
-      {/* Simple User Manual & .TXT Guide Modal for Tita Nerry */}
-      <SimpleGuideModal
-        isOpen={titaNerryGuideOpen}
-        onClose={() => setTitaNerryGuideOpen(false)}
-        onOpenTutorial={() => setTutorialOpen(true)}
-        onOpenFlowchart={() => handleSelectNavTab('flowchart')}
-        onToggleTheme={(nextTheme) => setThemeId(nextTheme)}
-        currentTheme={themeId}
-        simpleNavMode={simpleNavMode}
-        onToggleSimpleNav={() => setSimpleNavMode((prev) => !prev)}
-        showToast={showToast}
-      />
 
       {/* Full-screen Glassmorphism TutorialManager Overlay */}
       <TutorialManager

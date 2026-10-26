@@ -85,7 +85,11 @@ class RootErrorBoundary extends React.Component {
 
 const rootElement = document.getElementById('root');
 
-if (rootElement) {
+if (rootElement && (typeof window === 'undefined' || !window.__DEPW_ROOT_RENDERED__)) {
+  if (typeof window !== 'undefined') {
+    window.__DEPW_ROOT_RENDERED__ = true;
+    window.__DEPW_APP_MOUNTED__ = true;
+  }
   createRoot(rootElement).render(
     <React.StrictMode>
       <RootErrorBoundary>
@@ -108,3 +112,4 @@ if (rootElement) {
     </React.StrictMode>
   );
 }
+

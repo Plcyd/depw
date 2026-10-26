@@ -52,7 +52,6 @@ export default function CommandCenterView({
   onOpenSmartTracker,
   onOpenJourneyReplay,
   onOpenTutorial,
-  onOpenTitaNerryGuide,
   onNavigateTab,
   showToast,
 }) {
@@ -199,23 +198,13 @@ export default function CommandCenterView({
                   Mabilis, Malinaw, at Ligtas na Serbisyong Paglilinis ng Kanal
                 </h2>
                 <p className="text-sm text-[var(--text-secondary)] mt-1.5 leading-relaxed">
-                  Ang opisyal na public works command center ng Lungsod ng Maynila. May kasamang simpleng gabay para kay Tita Nerry, step-by-step tutorial, at 8-hakbang na flowchart!
+                  Ang opisyal na public works command center ng Lungsod ng Maynila. May kasamang step-by-step tutorial, water quality zone logger, at 8-hakbang na flowchart!
                 </p>
               </div>
             </div>
 
             {/* Quick Actions & Dismiss */}
             <div className="flex flex-wrap items-center gap-2">
-              {onOpenTitaNerryGuide && (
-                <button
-                  type="button"
-                  onClick={() => onOpenTitaNerryGuide()}
-                  className={styles.secondaryBtn}
-                  style={{ padding: '8px 14px', fontSize: '12px' }}
-                >
-                  <span>📄 Gabay ni Tita Nerry (.TXT)</span>
-                </button>
-              )}
               <button
                 type="button"
                 onClick={() => onOpenTutorial && onOpenTutorial()}
@@ -319,7 +308,7 @@ export default function CommandCenterView({
             </div>
 
             <div
-              onClick={() => onOpenTitaNerryGuide ? onOpenTitaNerryGuide() : onOpenTutorial?.()}
+              onClick={() => onNavigateTab?.('waterlog')}
               style={{
                 padding: '14px',
                 borderRadius: '12px',
@@ -331,14 +320,14 @@ export default function CommandCenterView({
             >
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-105 transition">
-                  <HelpCircle size={18} />
+                  <Droplets size={18} />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-[var(--text-primary)]">
-                    4. Gabay ni Tita Nerry
+                    4. Water Quality Log
                   </div>
                   <div className="text-[11px] text-[var(--text-muted)]">
-                    Simple .TXT manual at Tutorial
+                    Itala ang DO, H2S, at Turbidity
                   </div>
                 </div>
               </div>

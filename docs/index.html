@@ -12,15 +12,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script type="module" crossorigin src="./assets/index-DuJlauEk.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BaC5Ye1U.css">
+    <script type="module" crossorigin src="./assets/depw-app.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/depw-app.css">
   </head>
   <body>
     <div id="root">
       <div style="min-height: 100vh; background: #060d1f; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #f8fafc; padding: 24px; text-align: center;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-          <img src="./assets/aistudio/image_5aec6efb.png" alt="City of Manila Seal" style="width: 54px; height: 54px; object-fit: contain;" />
-          <img src="./assets/aistudio/image_81ca72a0.png" alt="DEPW Seal" style="width: 54px; height: 54px; object-fit: contain;" />
+          <img
+            src="./assets/image_5aec6efb.png"
+            alt="City of Manila Seal"
+            onerror="if(!this.dataset.r){this.dataset.r='1';this.src='./public/assets/aistudio/image_5aec6efb.png';}"
+            style="width: 54px; height: 54px; object-fit: contain;"
+          />
+          <img
+            src="./assets/image_81ca72a0.png"
+            alt="DEPW Seal"
+            onerror="if(!this.dataset.r){this.dataset.r='1';this.src='./public/assets/aistudio/image_81ca72a0.png';}"
+            style="width: 54px; height: 54px; object-fit: contain;"
+          />
         </div>
         <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #38bdf8; margin-bottom: 6px;">
           LUNGSOD NG MAYNILA • DEPW
@@ -32,9 +42,9 @@
           Handling of Barangay Declogging & Drainage Requests. Inihahanda ang dashboard at operations tracker...
         </p>
         <div style="display: flex; align-items: center; gap: 8px;">
-          <div style="width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; animation: bounce 1.4s infinite ease-in-out both;"></div>
-          <div style="width: 8px; height: 8px; border-radius: 50%; background: #34d399; animation: bounce 1.4s infinite ease-in-out both 0.2s;"></div>
-          <div style="width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; animation: bounce 1.4s infinite ease-in-out both 0.4s;"></div>
+          <div style="width: 8px; height: 8px; border-radius: 50%; background: #38bdf8;"></div>
+          <div style="width: 8px; height: 8px; border-radius: 50%; background: #34d399;"></div>
+          <div style="width: 8px; height: 8px; border-radius: 50%; background: #fbbf24;"></div>
         </div>
       </div>
     </div>
@@ -55,21 +65,60 @@
       window.__bootGhPagesStaticBundle = function () {
         if (window.__DEPW_APP_MOUNTED__ || window.__DEPW_BOOTING_FALLBACK__) return;
         window.__DEPW_BOOTING_FALLBACK__ = true;
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = './public/gh-pages-dist/app.css';
-        document.head.appendChild(link);
-        var script = document.createElement('script');
-        script.type = 'module';
-        script.src = './public/gh-pages-dist/app.js';
-        document.body.appendChild(script);
-      };
-      setTimeout(function () {
-        if (!window.__DEPW_APP_MOUNTED__ && window.location.hostname.indexOf('github.io') !== -1) {
-          window.__bootGhPagesStaticBundle();
+
+        var cssCandidates = [
+          './assets/depw-app.css',
+          './public/gh-pages-dist/app.css',
+          './docs/assets/depw-app.css'
+        ];
+        function tryLoadCss(idx) {
+          if (idx >= cssCandidates.length) return;
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = cssCandidates[idx];
+          link.onerror = function () {
+            tryLoadCss(idx + 1);
+          };
+          document.head.appendChild(link);
         }
-      }, 1800);
+        tryLoadCss(0);
+
+        var jsCandidates = [
+          './assets/depw-app.js',
+          './public/gh-pages-dist/app.js',
+          './docs/assets/depw-app.js'
+        ];
+        function tryLoadJs(idx) {
+          if (idx >= jsCandidates.length || window.__DEPW_APP_MOUNTED__) return;
+          var script = document.createElement('script');
+          script.type = 'module';
+          script.src = jsCandidates[idx];
+          script.onerror = function () {
+            tryLoadJs(idx + 1);
+          };
+          document.body.appendChild(script);
+        }
+        tryLoadJs(0);
+      };
+
+      // Immediately boot static bundle on GitHub Pages or static hosts where Vite dev server is not active
+      var isViteDevServer = Boolean(document.querySelector('script[src*="/@vite/client"]'));
+      if (
+        !isViteDevServer &&
+        (window.location.hostname.indexOf('github.io') !== -1 ||
+          window.location.protocol === 'file:')
+      ) {
+        window.__bootGhPagesStaticBundle();
+      } else if (!isViteDevServer) {
+        setTimeout(function () {
+          if (!window.__DEPW_APP_MOUNTED__) {
+            window.__bootGhPagesStaticBundle();
+          }
+        }, 800);
+      }
     </script>
   </body>
 </html>
+
+
 

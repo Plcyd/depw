@@ -261,3 +261,33 @@ test('validateWaterQualityEntry validates identified drainage zone water quality
   assert.equal(critEntryRes.isValid, true);
   assert.equal(critEntryRes.entry.overallStatus, 'CRITICAL');
 });
+
+test('user profile helpers validate officer profile fields and compute initials accurately', async () => {
+  const { DEPW_OFFICER_PROFILES, getUserInitials, validateUserProfile } = await import('./workflowRules.js');
+  assert.ok(DEPW_OFFICER_PROFILES.length >= 4);
+  assert.equal(getUserInitials('Engr. Lorenzo T. Macapagal'), 'LM');
+  assert.equal(getUserInitials('Engr. Camille R. Aquino'), 'CA');
+
+  const invalidProfile = validateUserProfile({
+    fullName: '',
+    roleTitle: '',
+    division: '',
+    districtAssignment: '',
+    badgeId: '',
+  });
+  assert.equal(invalidProfile.isValid, false);
+  assert.ok(invalidProfile.errors.length >= 5);
+
+  const validProfile = validateUserProfile({
+    fullName: 'Engr. Camille R. Aquino',
+    roleTitle: 'Water Quality & Estero Field Inspector',
+    division: 'Environmental & Waterway Telemetry Unit',
+    districtAssignment: 'District I & II (Tondo / Binondo)',
+    badgeId: 'DEPW-MNL-2026-029',
+    email: 'c.aquino@depw.manila.gov.ph',
+    dutyStatus: 'In Field • Estero de Vitas',
+  });
+  assert.equal(validProfile.isValid, true);
+  assert.equal(validProfile.profile.badgeId, 'DEPW-MNL-2026-029');
+});
+

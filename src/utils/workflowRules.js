@@ -1719,3 +1719,127 @@ export function validateWaterQualityEntry(input = {}) {
     evaluation,
   };
 }
+
+/**
+ * Official DEPW Manila Officer Profiles for the Top Bar & Session Switcher
+ */
+export const DEPW_OFFICER_PROFILES = [
+  {
+    profileId: 'OFF-DEPW-001',
+    fullName: 'Engr. Lorenzo T. Macapagal',
+    roleTitle: 'Chief Drainage & Declogging Engineer',
+    division: 'Flood Control & Drainage Operations Division',
+    districtAssignment: 'All 6 Legislative Districts (Citywide)',
+    badgeId: 'DEPW-MNL-2026-014',
+    email: 'l.macapagal@depw.manila.gov.ph',
+    shift: 'Day Shift (08:00 – 17:00 PST)',
+    dutyStatus: 'On-Duty • Command Center',
+    clearanceLevel: 'Division Chief / Approving Officer',
+  },
+  {
+    profileId: 'OFF-DEPW-002',
+    fullName: 'Engr. Camille R. Aquino',
+    roleTitle: 'Water Quality & Estero Field Inspector',
+    division: 'Environmental & Waterway Telemetry Unit',
+    districtAssignment: 'District I & II (Tondo / Binondo)',
+    badgeId: 'DEPW-MNL-2026-029',
+    email: 'c.aquino@depw.manila.gov.ph',
+    shift: 'Field Inspection Shift (07:00 – 16:00 PST)',
+    dutyStatus: 'In Field • Estero de Vitas',
+    clearanceLevel: 'Field Telemetry Inspector',
+  },
+  {
+    profileId: 'OFF-DEPW-003',
+    fullName: 'Ma. Teresa V. Santos',
+    roleTitle: 'Senior Barangay Liaison Coordinator',
+    division: 'Barangay Declogging Intake & Records Desk',
+    districtAssignment: 'District III & IV (Sampaloc / Quiapo / Sta. Cruz)',
+    badgeId: 'DEPW-MNL-2026-042',
+    email: 'm.santos@depw.manila.gov.ph',
+    shift: 'Day Shift (08:00 – 17:00 PST)',
+    dutyStatus: 'On-Duty • Liaison Desk',
+    clearanceLevel: 'Liaison & Records Verifier',
+  },
+  {
+    profileId: 'OFF-DEPW-004',
+    fullName: 'Engr. Mateo R. Del Rosario',
+    roleTitle: 'Jet-Vac & Declogging Fleet Supervisor',
+    division: 'Mechanical Equipment & Desilting Crew',
+    districtAssignment: 'District V & VI (Ermita / Malate / Paco / Sta. Ana)',
+    badgeId: 'DEPW-MNL-2026-058',
+    email: 'm.delrosario@depw.manila.gov.ph',
+    shift: 'Rapid Dispatch Shift',
+    dutyStatus: 'On-Duty • Dispatch Ready',
+    clearanceLevel: 'Fleet & Crew Operations Lead',
+  },
+];
+
+export function getUserInitials(fullName = '') {
+  const cleaned = String(fullName || '')
+    .replace(/^(Engr\.|Dr\.|Hon\.|Arch\.|Atty\.|Mr\.|Ms\.|Mrs\.|Ma\.)\s+/gi, '')
+    .trim();
+  if (!cleaned) return 'DO';
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
+export function validateUserProfile(input = {}) {
+  const errors = [];
+  const fullName = String(input.fullName || '').trim();
+  const roleTitle = String(input.roleTitle || '').trim();
+  const division = String(input.division || '').trim();
+  const districtAssignment = String(input.districtAssignment || '').trim();
+  const badgeId = String(input.badgeId || '').trim();
+  const email = String(input.email || '').trim();
+  const shift = String(input.shift || 'Day Shift (08:00 – 17:00 PST)').trim();
+  const dutyStatus = String(input.dutyStatus || 'On-Duty • Command Center').trim();
+  const clearanceLevel = String(input.clearanceLevel || 'DEPW Operations Officer').trim();
+
+  if (!fullName || fullName.length < 2) {
+    errors.push('Full Name is required (at least 2 characters).');
+  }
+  if (!roleTitle || roleTitle.length < 2) {
+    errors.push('Role / Position Title is required.');
+  }
+  if (!division || division.length < 2) {
+    errors.push('DEPW Division / Unit is required.');
+  }
+  if (!districtAssignment || districtAssignment.length < 2) {
+    errors.push('District Assignment is required.');
+  }
+  if (!badgeId || badgeId.length < 2) {
+    errors.push('Official Badge / Employee ID is required.');
+  }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.push('Please enter a valid official email address.');
+  }
+
+  if (errors.length > 0) {
+    return {
+      isValid: false,
+      errors,
+      profile: null,
+    };
+  }
+
+  return {
+    isValid: true,
+    errors: [],
+    profile: {
+      profileId: String(input.profileId || `OFF-CUSTOM-${Date.now()}`),
+      fullName,
+      roleTitle,
+      division,
+      districtAssignment,
+      badgeId,
+      email: email || 'officer@depw.manila.gov.ph',
+      shift: shift || 'Day Shift (08:00 – 17:00 PST)',
+      dutyStatus: dutyStatus || 'On-Duty • Command Center',
+      clearanceLevel,
+    },
+  };
+}
+
